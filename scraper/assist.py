@@ -1,4 +1,3 @@
-import sys
 import requests
 from concurrent.futures import ThreadPoolExecutor
 
@@ -97,7 +96,7 @@ def scrape_csu_ges(cc_id: int, year_id: int, current_term: str) -> dict:
     print(f'Error scraping {cc_id}')
     return None
 
-def load_csu_ges(cc_ids, year_id, current_term, reload=False):
+def load_csu_ges(cc_ids: list, year_id: int, current_term: str, reload=False):
     '''
     Load transferrable GE courses from each community college
 
@@ -126,4 +125,4 @@ def load_csu_ges(cc_ids, year_id, current_term, reload=False):
 if __name__ == '__main__':
     institutions = load_institutions()
     cc_ids = [institution["id"] for institution in institutions if institution["isCommunityCollege"]]
-    load_csu_ges(cc_ids, year_id=75, current_term="F2024", reload=True)
+    load_csu_ges(cc_ids, year_id=75, current_term="F2024")
