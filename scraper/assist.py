@@ -93,7 +93,6 @@ def scrape_csu_ges(cc_id: int, year_id: int, current_term: str) -> dict:
         except Exception as e:
             print(f'Error scraping {cc_id}: {e}')
     
-    print(f'Error scraping {cc_id}')
     return None
 
 def load_csu_ges(cc_ids: list, year_id: int, current_term: str, reload=False):
