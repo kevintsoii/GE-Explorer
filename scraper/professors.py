@@ -15,7 +15,7 @@ API_URL = os.getenv('PROFESSORS_API')
 AUTH = os.getenv('PROFESSORS_AUTH')
 
 MAX_RETRIES = 3
-MAX_THREADS = 10
+MAX_THREADS = 20
 
 headers = {
     'Authorization': f'Basic {AUTH}',
@@ -183,24 +183,44 @@ def scrape_professor(college_id: str, professor_name: str) -> tuple:
             )
             results = r.json()["data"]["search"]["teachers"]["edges"]
 
+            result = None
+            # first, find exact name result
             for professor in results:
-                first_min_length = min(len(first), len(professor["node"]["firstName"]))
-                last_min_length = min(len(last), len(professor["node"]["lastName"]))
-                if first.lower()[:first_min_length] == professor["node"]["firstName"].lower()[:first_min_length] and last.lower()[:last_min_length] == professor["node"]["lastName"].lower()[:last_min_length]:
-                    return college_id, {
-                        "name": professor_name,
-                        "id": professor["node"]["id"],
-                        "legacyId": professor["node"]["legacyId"],
-                        "firstName": professor["node"]["firstName"],
-                        "lastName": professor["node"]["lastName"],
-                        "numRatings": professor["node"]["numRatings"],
-                        "avgRating": professor["node"]["avgRating"],
-                        "avgDifficulty": professor["node"]["avgDifficulty"],
-                        "wouldTakeAgainPercent": professor["node"]["wouldTakeAgainPercent"],
-                        "ratings": [edge["node"] for edge in professor["node"]["ratings"]["edges"]]
-                    }
+                if first.lower() == professor["node"]["firstName"].lower() and last.lower() == professor["node"]["lastName"].lower():
+                    result = professor
+                    break
+            
+            # second, try to find switched first and last
+            if result is None:
+                for professor in results:
+                    if first.lower() == professor["node"]["lastName"].lower() and last.lower() == professor["node"]["firstName"].lower():
+                        result = professor
+                        break
+
+            # third, try to find with similar name
+            if result is None:
+                for professor in results:
+                    first_min_length = min(len(first), len(professor["node"]["firstName"]))
+                    last_min_length = min(len(last), len(professor["node"]["lastName"]))
+                    if first.lower()[:first_min_length] == professor["node"]["firstName"].lower()[:first_min_length] and last.lower()[:last_min_length] == professor["node"]["lastName"].lower()[:last_min_length]:
+                        result = professor
+                        break
+
+            if result:
+                return college_id, {
+                    "name": professor_name,
+                    "id": result["node"]["id"],
+                    "legacyId": result["node"]["legacyId"],
+                    "firstName": result["node"]["firstName"],
+                    "lastName": result["node"]["lastName"],
+                    "numRatings": result["node"]["numRatings"],
+                    "avgRating": result["node"]["avgRating"],
+                    "avgDifficulty": result["node"]["avgDifficulty"],
+                    "wouldTakeAgainPercent": result["node"]["wouldTakeAgainPercent"],
+                    "ratings": [edge["node"] for edge in result["node"]["ratings"]["edges"]]
+                }
     
-            print(f'Professor not found: {professor_name}, {colleges[college_id]}')
+            print(f'Professor not found: {professor_name} -> {first} {last}, {colleges[college_id]}')
             break
         except Exception as e:
             print(f'Error: {e}')

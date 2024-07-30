@@ -13,6 +13,7 @@ Grabbing GE, course, and professor info
    ```
    COURSES_API=
    PROFESSORS_API=
+   PROFESSORS_AUTH=
    ```
 
 2. (Optional) Set up a venv

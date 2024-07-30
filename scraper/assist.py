@@ -106,6 +106,10 @@ def load_csu_ges(cc_ids: list, year_id: int, current_term: str, reload=False):
     data = load_json('data.json')
     csu_ges = data.get("csu_ges")
     if csu_ges and not reload:
+        csu_ges["Coastline College"] = csu_ges.pop("Coastline Community College")
+        csu_ges["Coalinga College"] = csu_ges.pop("West Hills College Coalinga")
+        csu_ges["Lemoore College"] = csu_ges.pop("West Hills College Lemoore")
+        csu_ges["Mt. San Antonio College"] = csu_ges.pop("Mount San Antonio College")
         return csu_ges
 
     data["csu_ges"] = {}
