@@ -173,4 +173,4 @@ def load_sections(courses: list, reload=False) -> list:
 if __name__ == '__main__':
     subjects = load_subjects()
     cc_courses = load_courses(subjects)
-    sections = load_sections(cc_courses, reload=True)
+    sections = load_sections(cc_courses)

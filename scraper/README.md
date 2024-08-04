@@ -8,12 +8,13 @@ Grabbing GE, course, and professor info
 
 ## Getting Started
 
-1. Create an `.env` file with the API URLs
+1. Create an `.env` file with the API URLs and MongoDB URI
 
    ```
    COURSES_API=
    PROFESSORS_API=
    PROFESSORS_AUTH=
+   MONGODB_URI=
    ```
 
 2. (Optional) Set up a venv
