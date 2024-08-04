@@ -30,6 +30,6 @@ const server = new ApolloServer({
 
 export default startServerAndCreateNextHandler(server, {
   context: async ({ req, res }) => {
-    return True;
+    return true;
   },
 });
