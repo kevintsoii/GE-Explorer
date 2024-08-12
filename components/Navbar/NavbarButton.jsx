@@ -10,8 +10,8 @@ const NavbarButton = ({ text = "Click Here", redirect = "/" }) => {
     <Link href={redirect}>
       <button
         className={`${
-          isActive ? "text-blue-600" : "text-gray-600"
-        } font-medium hover:text-black hover:bg-gray-200 rounded-md py-1 px-3`}
+          isActive ? "text-blue-600" : "text-gray-600 hover:text-black"
+        } font-medium hover:bg-gray-200 rounded-md py-1 px-3`}
       >
         {text}
       </button>

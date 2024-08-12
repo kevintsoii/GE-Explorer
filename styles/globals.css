@@ -7,4 +7,5 @@ body,
 #__next {
   @apply min-h-screen;
   @apply max-w-full;
+  @apply overflow-x-hidden;
 }
