@@ -9,3 +9,19 @@ body,
   @apply max-w-full;
   @apply overflow-x-hidden;
 }
+
+.loader {
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(farthest-side, #1673ff 94%, #0000) top/8px 8px
+      no-repeat,
+    conic-gradient(#0000 30%, #1673ff);
+  -webkit-mask: radial-gradient(farthest-side, #0000 calc(100% - 8px), #000 0);
+  animation: spinner 1s infinite linear;
+}
+
+@keyframes spinner {
+  100% {
+    transform: rotate(1turn);
+  }
+}

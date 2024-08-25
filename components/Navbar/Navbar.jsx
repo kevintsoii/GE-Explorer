@@ -7,7 +7,7 @@ import NavbarButton from "./NavbarButton";
 
 const Navbar = () => {
   return (
-    <nav className="absolute flex w-full h-20 items-center justify-between sm:px-8 md:px-16 lg:px-32">
+    <nav className="absolute flex w-full h-20 items-center justify-between sm:px-8 md:px-16 lg:px-32 overflow-x-hidden">
       <Link href="/">
         <h1 className="font-semibold flex gap-1 text-xl items-center">
           <Globe className="text-blue-600" size={30} strokeWidth={1.5} />

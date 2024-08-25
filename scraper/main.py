@@ -115,6 +115,7 @@ def save_professors():
     cc_professors.create_index("avgGrade")
     cc_professors.create_index("avgDifficulty")
     cc_professors.create_index("takeAgain")
+    cc_professors.create_index("officialName")
 
     professors = []
     professor_info = load_professors([], {})
