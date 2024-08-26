@@ -1,10 +1,12 @@
+"use client";
+
 import Link from "next/link";
 import React from "react";
-import { useRouter } from "next/router";
+import { usePathname } from "next/navigation";
 
 const NavbarButton = ({ text = "Click Here", redirect = "/" }) => {
-  const router = useRouter();
-  const isActive = router.pathname === redirect;
+  const pathname = usePathname();
+  const isActive = pathname === redirect;
 
   return (
     <Link href={redirect}>

@@ -1,8 +1,10 @@
+"use client";
+
 import React from "react";
 import { gql, useLazyQuery } from "@apollo/client";
 
-import Loader from "@/components/Loader";
-import Error from "@/components/Error";
+import Loader from "@/app/_components/Loader";
+import Error from "@/app/_components/Error";
 
 const GET_COURSES = gql`
   query GetCourses {

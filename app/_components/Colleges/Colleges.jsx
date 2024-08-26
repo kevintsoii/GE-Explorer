@@ -1,12 +1,13 @@
+"use client";
+
 import React, { useState } from "react";
 import { gql, useQuery } from "@apollo/client";
 
-import Loader from "@/components/Loader";
-import Error from "@/components/Error";
-import Divider from "@/components/Divider";
-import SearchBox from "@/components/SearchBox";
-import Select from "@/components/Select";
-import CollegeGrid from "@/components/Colleges/CollegeGrid";
+import Loader from "@/app/_components/Loader";
+import Error from "@/app/_components/Error";
+import SearchBox from "@/app/_components/SearchBox";
+import Select from "@/app/_components/Select";
+import CollegeGrid from "./CollegeGrid";
 
 const GET_COLLEGES = gql`
   query GetColleges {
@@ -33,15 +34,7 @@ const Colleges = () => {
       : filteredData;
 
   return (
-    <main className="flex min-h-screen flex-col py-20 px-4 sm:px-8 md:px-16 lg:px-32 gap-6">
-      <h1 className="self-start mt-3 font-bold text-3xl">Community Colleges</h1>
-      <p className="text-lg">
-        Many CCs have courses that are transferrable to CSU. View some popular
-        options below.
-      </p>
-
-      <Divider />
-
+    <>
       <div className="flex flex-col lg:flex-row gap-6">
         <SearchBox
           searchQuery={searchQuery}
@@ -60,7 +53,7 @@ const Colleges = () => {
       {error && <Error />}
       {data && sortedData.length == 0 && <div>No results found.</div>}
       {data && sortedData.length > 0 && <CollegeGrid data={filteredData} />}
-    </main>
+    </>
   );
 };
 

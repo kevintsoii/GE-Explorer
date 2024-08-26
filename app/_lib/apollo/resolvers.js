@@ -4,16 +4,13 @@ import connectToDatabase from "../mongoose/mongoose";
 import Professor from "../mongoose/models/professor";
 import { anyOrderRegex } from "../util/search";
 
-let db;
-(async () => {
-  db = await connectToDatabase();
-})();
-
 async function areas() {
+  const db = await connectToDatabase();
   return await db.collection("ge-areas").find({}).sort({ area: 1 }).toArray();
 }
 
 async function colleges() {
+  const db = await connectToDatabase();
   const colleges = await Professor.aggregate([
     {
       $group: {
@@ -36,6 +33,7 @@ async function colleges() {
 }
 
 async function courses(parent, args) {
+  const db = await connectToDatabase();
   const courses = await db
     .collection("cc-courses")
     .aggregate([
@@ -91,6 +89,7 @@ async function courses(parent, args) {
 }
 
 async function getTransfers(parent, args) {
+  const db = await connectToDatabase();
   if (!args.college) {
     throw new GraphQLError("Invalid arguments");
   }
@@ -100,6 +99,7 @@ async function getTransfers(parent, args) {
 }
 
 async function getProfessor(parent, args) {
+  const db = await connectToDatabase();
   if (!args.id || args.id < 0) {
     throw new GraphQLError("Invalid arguments");
   }
@@ -107,6 +107,7 @@ async function getProfessor(parent, args) {
 }
 
 async function getProfessors(parent, args) {
+  const db = await connectToDatabase();
   let query = {};
   if (args.name && args.name.trim().length > 3) {
     query.officialName = {

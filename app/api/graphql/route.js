@@ -2,9 +2,9 @@ import GraphQLJSON from "graphql-type-json";
 import { ApolloServer } from "@apollo/server";
 import { startServerAndCreateNextHandler } from "@as-integrations/next";
 
-import typeDefs from "../../lib/apollo/schema";
-import { dateScalar } from "../../lib/apollo/scalars";
-import queryResolvers from "../../lib/apollo/resolvers";
+import typeDefs from "@/app/_lib/apollo/schema";
+import { dateScalar } from "@/app/_lib/apollo/scalars";
+import queryResolvers from "@/app/_lib/apollo/resolvers";
 
 const resolvers = {
   JSON: GraphQLJSON,
@@ -26,8 +26,10 @@ const server = new ApolloServer({
   debug: process.env.NODE_ENV !== "production",
 });
 
-export default startServerAndCreateNextHandler(server, {
+const handler = startServerAndCreateNextHandler(server, {
   context: async ({ req, res }) => {
     return true;
   },
 });
+
+export { handler as GET, handler as POST };
