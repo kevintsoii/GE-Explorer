@@ -1,5 +1,5 @@
 import { GraphQLError } from "graphql";
-
+import { ObjectId } from "mongodb";
 import connectToDatabase from "../mongoose/mongoose";
 import Professor from "../mongoose/models/professor";
 import { anyOrderRegex } from "../util/search";
@@ -10,7 +10,6 @@ async function areas() {
 }
 
 async function colleges() {
-  const db = await connectToDatabase();
   const colleges = await Professor.aggregate([
     {
       $group: {
@@ -32,13 +31,47 @@ async function colleges() {
   return colleges;
 }
 
-async function courses(parent, args) {
+async function courses(_, args) {
   const db = await connectToDatabase();
+
+  const page_size = 15;
+  const filters = {};
+  if (args.colleges?.length > 0) {
+    filters.college = { $in: args.colleges };
+  }
+  if (args.areas?.length > 0) {
+    filters.areas = { $in: args.areas };
+  }
+  if (args.cursor) {
+    filters._id = { $gt: new ObjectId(args.cursor) };
+  }
+  if (args.sections) {
+    filters.sectionCount = { $gte: args.sections };
+  }
+  if (args.searchTerm) {
+    filters.$or = [
+      { course: { $regex: new RegExp(args.searchTerm, "i") } },
+      { title: { $regex: new RegExp(args.searchTerm, "i") } },
+      { description: { $regex: new RegExp(args.searchTerm, "i") } },
+    ];
+  }
+
   const courses = await db
     .collection("cc-courses")
     .aggregate([
       {
-        $unwind: "$sections",
+        $match: {
+          ...filters,
+        },
+      },
+      {
+        $sort: { _id: 1 },
+      },
+      {
+        $limit: page_size + 1,
+      },
+      {
+        $unwind: { path: "$sections", preserveNullAndEmptyArrays: true },
       },
       {
         $lookup: {
@@ -59,6 +92,9 @@ async function courses(parent, args) {
               },
             },
             {
+              $project: { avgRating: 1, avgGrade: 1 },
+            },
+            {
               $limit: 1,
             },
           ],
@@ -66,36 +102,45 @@ async function courses(parent, args) {
         },
       },
       {
-        $unwind: "$professorInfo",
+        $unwind: { path: "$professorInfo", preserveNullAndEmptyArrays: true },
       },
       {
         $group: {
           _id: "$_id",
           college: { $first: "$college" },
           course: { $first: "$course" },
+          areas: { $first: "$areas" },
           identifier: { $first: "$identifier" },
           description: { $first: "$description" },
           price: { $first: "$price" },
           units: { $first: "$units" },
           title: { $first: "$title" },
           avgRating: { $avg: "$professorInfo.avgRating" },
+          avgGrade: { $avg: "$professorInfo.avgGrade" },
           sectionCount: { $sum: 1 },
         },
+      },
+      {
+        $sort: { _id: 1 },
       },
     ])
     .toArray();
 
-  return courses;
-}
-
-async function getTransfers(parent, args) {
-  const db = await connectToDatabase();
-  if (!args.college) {
-    throw new GraphQLError("Invalid arguments");
+  let hasNextPage = false;
+  let endCursor = null;
+  if (courses.length > page_size) {
+    courses.pop();
+    hasNextPage = true;
+    endCursor = courses[courses.length - 1]._id;
   }
-  return await db
-    .collection("ge-transfers")
-    .findOne({ college: { $regex: new RegExp(args.college.trim(), "i") } });
+
+  return {
+    edges: courses,
+    pageInfo: {
+      hasNextPage,
+      endCursor,
+    },
+  };
 }
 
 async function getProfessor(parent, args) {
@@ -130,7 +175,6 @@ const resolvers = {
   areas,
   colleges,
   courses,
-  getTransfers,
   getProfessor,
   getProfessors,
 };

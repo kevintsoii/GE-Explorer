@@ -1,23 +1,15 @@
 "use client";
 
 import React, { useState } from "react";
-import { gql, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
+
+import { GET_COLLEGES } from "@/app/_lib/apollo/queries";
 
 import Loader from "@/app/_components/Loader";
 import Error from "@/app/_components/Error";
 import SearchBox from "@/app/_components/SearchBox";
 import Select from "@/app/_components/Select";
 import CollegeGrid from "./CollegeGrid";
-
-const GET_COLLEGES = gql`
-  query GetColleges {
-    colleges {
-      avgRating
-      college
-      ratings
-    }
-  }
-`;
 
 const Colleges = () => {
   const { loading, error, data } = useQuery(GET_COLLEGES);
@@ -35,7 +27,7 @@ const Colleges = () => {
 
   return (
     <>
-      <div className="flex flex-col lg:flex-row gap-6">
+      <div className="flex flex-col lg:flex-row gap-4 mb-2">
         <SearchBox
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}

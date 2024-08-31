@@ -1,21 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
-import { gql, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
+
+import { GET_AREAS } from "@/app/_lib/apollo/queries";
 
 import Loader from "@/app/_components/Loader";
 import Error from "@/app/_components/Error";
 import AreaGrid from "@/app/_components/Areas/AreaGrid";
 import SearchBox from "@/app/_components/SearchBox";
-
-const GET_AREAS = gql`
-  query GetAreas {
-    areas {
-      area
-      title
-    }
-  }
-`;
 
 const Areas = () => {
   const { loading, error, data } = useQuery(GET_AREAS);

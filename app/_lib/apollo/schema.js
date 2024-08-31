@@ -20,21 +20,23 @@ export default gql`
     college: String!
     course: String!
     description: String!
-    price: Float!
-    units: String!
+    price: Float
+    units: String
     title: String!
     avgRating: Float
+    avgGrade: Float
+    areas: [String]!
     sectionCount: Int!
   }
 
-  type TransferCourse {
-    course: String!
-    areas: [String]!
+  type PaginatedCourse {
+    edges: [Course]!
+    pageInfo: PageInfo!
   }
 
-  type Transfer {
-    college: String!
-    courses: [TransferCourse]!
+  type PageInfo {
+    hasNextPage: Boolean!
+    endCursor: String
   }
 
   type Section {
@@ -72,9 +74,14 @@ export default gql`
   type Query {
     areas: [Area]!
     colleges: [College]!
-    courses: [Course]!
+    courses(
+      colleges: [String]
+      areas: [String]
+      cursor: String
+      sections: Int
+      searchTerm: String
+    ): PaginatedCourse!
 
-    getTransfers(college: String!): Transfer
     getProfessor(id: ID): Professor
     getProfessors(name: String, college: String): [Professor]
   }

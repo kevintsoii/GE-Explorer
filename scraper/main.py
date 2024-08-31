@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from pymongo import errors
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
+from collections import defaultdict
 
 from assist import load_csu_ges
 from courses import load_sections
@@ -32,21 +33,13 @@ def save_ges():
     Collection ge-transfers stores documents { college, courses[{ course, areas[] }] }
     '''
     ge_areas = db["ge-areas"]
-    ge_transfers = db["ge-transfers"]
     ge_areas.create_index("area", unique=True)
-    ge_transfers.create_index("college", unique=True)
 
     csu_ges = load_csu_ges([], year_id=75, current_term="F2024")
 
     area_info = {}
-    transfer_info = {}
     for cc in csu_ges:
-        transfer_info[cc] = []
         for course in csu_ges[cc]:
-            transfer_info[cc].append({
-                "course": f'{course["prefix"].upper()} {course["number"]}',
-                "areas": [area["area"] for area in course["areas"]]
-            })
             for area in course["areas"]:
                 area_info[area["area"]] = area["title"]
 
@@ -57,14 +50,8 @@ def save_ges():
         )
     except errors.BulkWriteError as e:
         pass
-    try:
-        ge_transfers.insert_many(
-            [{"college": cc, "courses": transfer_info[cc]} for cc in transfer_info],
-            ordered=False
-        )
-    except errors.BulkWriteError as e:
-        pass
-    print("Saved GE areas and transfers")
+
+    print("Saved GE areas")
 
 def save_courses():
     '''
@@ -77,10 +64,13 @@ def save_courses():
     
     csu_ges = load_csu_ges([], year_id=75, current_term="F2024")
     transferrable = {}
+    transfer_areas = {}
     for cc in csu_ges:
         transferrable[cc] = set()
+        transfer_areas[cc] = defaultdict(set)
         for course in csu_ges[cc]:
             transferrable[cc].add(f'{course["prefix"].upper()}{course["number"]}'.replace(' ', '').replace('/', ''))
+            transfer_areas[cc][f'{course["prefix"].upper()}{course["number"]}'.replace(' ', '').replace('/', '')].update([x["area"] for x in course["areas"]])
 
     courses = []
     sections = load_sections([])
@@ -93,6 +83,7 @@ def save_courses():
                 del section["format"]
             course["title"] = course["course"].split(" - ")[-1]
             course["course"] = course["course"].split(" - ")[0]
+            course["areas"] = list(transfer_areas[course["college"]][course_code])
             courses.append(course)
 
     try:
@@ -116,6 +107,7 @@ def save_professors():
     cc_professors.create_index("avgDifficulty")
     cc_professors.create_index("takeAgain")
     cc_professors.create_index("officialName")
+    cc_professors.create_index([("officialName", 1), ("college", 1)])
 
     professors = []
     professor_info = load_professors([], {})
@@ -153,8 +145,8 @@ def save_professors():
                     tags[tag] += 1
             
             avg_grade = sum(grades) / len(grades) if len(grades) > 0 else None
-            if avg_grade is not None:
-                avg_grade = min(grade_map.keys(), key=lambda x: abs(grade_map[x] - avg_grade))
+            #if avg_grade is not None:
+                #avg_grade = min(grade_map.keys(), key=lambda x: abs(grade_map[x] - avg_grade))
 
             professors.append({
                 "id": professor["legacyId"],
@@ -181,7 +173,7 @@ def save_professors():
 
 
 #save_ges()
-#save_courses()
+save_courses()
 #save_professors()
 
 client.close()

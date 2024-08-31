@@ -5,7 +5,7 @@ import Divider from "@/app/_components/Divider";
 
 const AreasPage = () => {
   return (
-    <main className="flex min-h-screen flex-col py-20 px-4 sm:px-8 md:px-16 lg:px-32 gap-6">
+    <main className="flex min-h-screen flex-col py-20 px-4 sm:px-8 md:px-16 lg:px-32 gap-4">
       <h1 className="self-start mt-3 font-bold text-3xl">GE Areas</h1>
       <p className="text-lg">
         All CSU students are required to take General Education courses in
