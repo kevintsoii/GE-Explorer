@@ -13,6 +13,8 @@ import SearchBox from "@/app/_components/SearchBox";
 import MultiSelect from "@/app/_components/MultiSelect";
 import CoursesDisplay from "@/app/_components/Courses/CoursesDisplay";
 
+import { ArrowLeft, ArrowRight } from "lucide-react";
+
 const Courses = () => {
   const {
     loading: areaLoading,
@@ -29,17 +31,37 @@ const Courses = () => {
     searchTerm: "",
     colleges: [],
     areas: [],
+    cursor: "",
   });
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedColleges, setSelectedColleges] = useState([]);
   const [selectedAreas, setSelectedAreas] = useState([]);
 
+  const [cursorIndex, setCursorIndex] = useState(0);
+  const [cursorHistory, setCursorHistory] = useState(new Set([""]));
+
   const onSubmit = (e) => {
     e.preventDefault();
+    setCursorHistory(new Set([""]));
+    setCursorIndex(0);
     setVariables({
       searchTerm: searchQuery,
       colleges: selectedColleges,
       areas: selectedAreas,
+      cursor: "",
+    });
+  };
+
+  const onPageChange = (e, offset) => {
+    e.preventDefault();
+    setCursorIndex((index) => {
+      setVariables({
+        searchTerm: searchQuery,
+        colleges: selectedColleges,
+        areas: selectedAreas,
+        cursor: [...cursorHistory][index + offset] || "",
+      });
+      return index + offset;
     });
   };
 
@@ -81,9 +103,27 @@ const Courses = () => {
               <Search />
               Apply Search Filters
             </button>
+
+            <div className="flex gap-3 mt-2 text-lg items-center">
+              <button
+                className="disabled:text-gray-400"
+                disabled={cursorIndex - 1 < 0}
+                onClick={(e) => onPageChange(e, -1)}
+              >
+                <ArrowLeft />
+              </button>
+              Page {cursorIndex + 1}
+              <button
+                className="disabled:text-gray-400"
+                disabled={cursorIndex + 1 >= cursorHistory.size}
+                onClick={(e) => onPageChange(e, 1)}
+              >
+                <ArrowRight />
+              </button>
+            </div>
           </form>
 
-          <CoursesDisplay variables={variables} />
+          <CoursesDisplay variables={variables} setHistory={setCursorHistory} />
         </>
       )}
     </>

@@ -1,23 +1,49 @@
 import React from "react";
 import Rating from "@mui/material/Rating";
+import { mapGrade, mapColor } from "../../_lib/util/map";
 
 const CoursesCard = ({ data }) => {
   return (
     <div className="flex flex-col border rounded-lg min-h-24 py-4 px-4 hover:border-blue-500">
-      <h1 className="text-xl font-bold">
-        <span className="text-blue-500/90">{data.course} - </span>
-        {data.title}
-      </h1>
-      <h1 className="text-gray-500/90 font-medium text-xl">{data.college}</h1>
+      <a href={`/courses/${data.identifier}`} target="_blank">
+        <h1 className="text-xl font-bold">
+          {data.course} - {data.title}
+        </h1>
+        <h1 className="text-gray-500/90 font-medium text-xl">{data.college}</h1>
 
-      <h1 className="text-lg">{data.identifier}</h1>
-      <h1 className="text-lg">{data.description}</h1>
-      <h1 className="text-lg">{data.price}</h1>
-      <h1 className="text-lg">{data.units}</h1>
-      <h1 className="text-lg">{data.avgRating}</h1>
-      <h1 className="text-lg">{data.avgGrade}</h1>
-      <h1 className="text-lg">{data.areas}</h1>
-      <h1 className="text-lg">{data.sectionCount}</h1>
+        <hr className="my-2"></hr>
+
+        <div className="flex gap-1 text-lg items-center">
+          <p className="text-yellow-500">
+            {data.avgRating ? data.avgRating.toFixed(1) : "N/A"}
+          </p>
+          <Rating
+            defaultValue={data.avgRating}
+            precision={0.5}
+            readOnly
+            style={{ opacity: "90%" }}
+          />
+        </div>
+        <h1 className="text-lg">
+          Average:{" "}
+          <span
+            className={`${
+              data.avgRating
+                ? mapColor(mapGrade(data.avgGrade))
+                : mapColor("N/A")
+            }`}
+          >
+            {mapGrade(data.avgGrade)}
+          </span>{" "}
+        </h1>
+
+        <h1 className="text-lg">
+          {data.units} units - ${data.price}
+        </h1>
+        <h1 className="text-lg">
+          Areas: <span className="text-blue-500">{data.areas.join(", ")}</span>
+        </h1>
+      </a>
     </div>
   );
 };

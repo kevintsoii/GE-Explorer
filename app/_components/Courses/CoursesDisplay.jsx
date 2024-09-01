@@ -9,18 +9,23 @@ import Loader from "@/app/_components/Loader";
 import Error from "@/app/_components/Error";
 import CoursesGrid from "./CoursesGrid";
 
-const CoursesDisplay = ({ variables }) => {
-  const [cursor, setCursor] = useState(null);
-  const [history, setHistory] = useState([]);
-
+const CoursesDisplay = ({ variables, setHistory }) => {
   const [
     getCourses,
     { loading: coursesLoading, error: couresError, data: coursesData },
   ] = useLazyQuery(GET_COURSES);
 
   useEffect(() => {
-    getCourses({ variables });
-  }, [getCourses, variables]);
+    async function fetchData() {
+      const { data } = await getCourses({ variables });
+      if (data?.courses.pageInfo.hasNextPage) {
+        setHistory(
+          (history) => new Set([...history, data?.courses.pageInfo.endCursor])
+        );
+      }
+    }
+    fetchData();
+  }, [variables]);
 
   return (
     <div className="mt-3">
