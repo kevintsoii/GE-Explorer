@@ -7,11 +7,11 @@ import NavbarButton from "./NavbarButton";
 
 const Navbar = () => {
   return (
-    <nav className="absolute flex w-full h-20 items-center justify-between sm:px-8 md:px-16 lg:px-32 overflow-x-hidden">
+    <nav className="nav absolute flex w-full h-20 items-center justify-between sm:px-8 md:px-16 lg:px-32 overflow-x-hidden">
       <Link href="/">
         <h1 className="font-semibold flex gap-1 text-xl items-center">
-          <Globe className="text-blue-600" size={30} strokeWidth={1.5} />
-          GE <span className="text-blue-600">Explorer</span>
+          <Globe className="text-[#1359f9]" size={30} strokeWidth={1.5} />
+          GE <span className="text-[#1359f9]">Explorer</span>
         </h1>
       </Link>
       <div className="flex items-center">
