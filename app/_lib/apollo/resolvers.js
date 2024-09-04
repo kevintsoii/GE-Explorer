@@ -143,6 +143,81 @@ async function courses(_, args) {
   };
 }
 
+async function course(_, args) {
+  const db = await connectToDatabase();
+  if (!args.identifier || args.identifier.trim().length === 0) {
+    throw new GraphQLError("Invalid arguments");
+  }
+
+  const course = await db
+    .collection("cc-courses")
+    .aggregate([
+      {
+        $match: {
+          identifier: decodeURIComponent(args.identifier),
+        },
+      },
+      { $limit: 1 },
+      {
+        $unwind: { path: "$sections", preserveNullAndEmptyArrays: true },
+      },
+      {
+        $lookup: {
+          from: "cc-professors",
+          let: {
+            professorName: "$sections.professor",
+            collegeName: "$college",
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$officialName", "$$professorName"] },
+                    { $eq: ["$college", "$$collegeName"] },
+                  ],
+                },
+              },
+            },
+            {
+              $project: { avgRating: 1, avgGrade: 1 },
+            },
+            {
+              $limit: 1,
+            },
+          ],
+          as: "professorInfo",
+        },
+      },
+      {
+        $unwind: { path: "$professorInfo", preserveNullAndEmptyArrays: true },
+      },
+      {
+        $addFields: {
+          "sections.avgRating": "$professorInfo.avgRating",
+          "sections.avgGrade": "$professorInfo.avgGrade",
+        },
+      },
+      {
+        $group: {
+          _id: "$_id",
+          college: { $first: "$college" },
+          course: { $first: "$course" },
+          areas: { $first: "$areas" },
+          identifier: { $first: "$identifier" },
+          description: { $first: "$description" },
+          price: { $first: "$price" },
+          units: { $first: "$units" },
+          title: { $first: "$title" },
+          sections: { $push: "$sections" },
+        },
+      },
+    ])
+    .toArray();
+
+  return course[0];
+}
+
 async function getProfessor(parent, args) {
   const db = await connectToDatabase();
   if (!args.id || args.id < 0) {
@@ -175,6 +250,7 @@ const resolvers = {
   areas,
   colleges,
   courses,
+  course,
   getProfessor,
   getProfessors,
 };

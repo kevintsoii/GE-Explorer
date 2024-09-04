@@ -71,10 +71,35 @@ const GET_COURSES = gql`
   }
 `;
 
+const GET_COURSE = gql`
+  query Course($identifier: String!) {
+    course(identifier: $identifier) {
+      identifier
+      college
+      course
+      description
+      price
+      units
+      title
+      areas
+      sections {
+        date
+        professor
+        crn
+        seats
+        seats_updated
+        avgRating
+        avgGrade
+      }
+    }
+  }
+`;
+
 export {
   GET_AREAS,
   GET_AREA_NAMES,
   GET_COLLEGES,
   GET_COLLEGE_NAMES,
   GET_COURSES,
+  GET_COURSE,
 };

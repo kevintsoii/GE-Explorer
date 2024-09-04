@@ -15,7 +15,7 @@ export default gql`
     ratings: Int
   }
 
-  type Course {
+  type PaginatedCourse {
     identifier: String!
     college: String!
     course: String!
@@ -29,14 +29,26 @@ export default gql`
     sectionCount: Int!
   }
 
-  type PaginatedCourse {
-    edges: [Course]!
-    pageInfo: PageInfo!
-  }
-
   type PageInfo {
     hasNextPage: Boolean!
     endCursor: String
+  }
+
+  type PaginatedCourseResult {
+    edges: [PaginatedCourse]!
+    pageInfo: PageInfo!
+  }
+
+  type Course {
+    identifier: String!
+    college: String!
+    course: String!
+    description: String!
+    price: Float
+    units: String
+    title: String!
+    areas: [String]!
+    sections: [Section]!
   }
 
   type Section {
@@ -44,18 +56,9 @@ export default gql`
     professor: String!
     crn: String!
     seats: String!
-    updated: String!
-  }
-
-  type Review {
-    class: String
-    comment: String
-    date: Date
-    difficulty: Float
-    rating: Float
-    tags: [String]
-    takeAgain: Boolean
-    grade: String
+    seats_updated: String!
+    avgRating: Float
+    avgGrade: Float
   }
 
   type Professor {
@@ -71,6 +74,17 @@ export default gql`
     reviews: [Review]!
   }
 
+  type Review {
+    class: String
+    comment: String
+    date: Date
+    difficulty: Float
+    rating: Float
+    tags: [String]
+    takeAgain: Boolean
+    grade: String
+  }
+
   type Query {
     areas: [Area]!
     colleges: [College]!
@@ -80,7 +94,8 @@ export default gql`
       cursor: String
       sections: Int
       searchTerm: String
-    ): PaginatedCourse!
+    ): PaginatedCourseResult!
+    course(identifier: String!): Course
 
     getProfessor(id: ID): Professor
     getProfessors(name: String, college: String): [Professor]
