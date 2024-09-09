@@ -95,6 +95,32 @@ const GET_COURSE = gql`
   }
 `;
 
+const GET_PROFESSOR = gql`
+  query Query($college: String!, $name: String!) {
+    professor(college: $college, name: $name) {
+      id
+      officialName
+      name
+      college
+      avgRating
+      avgGrade
+      avgDifficulty
+      takeAgain
+      tags
+      reviews {
+        class
+        comment
+        date
+        difficulty
+        rating
+        tags
+        takeAgain
+        grade
+      }
+    }
+  }
+`;
+
 export {
   GET_AREAS,
   GET_AREA_NAMES,
@@ -102,4 +128,5 @@ export {
   GET_COLLEGE_NAMES,
   GET_COURSES,
   GET_COURSE,
+  GET_PROFESSOR,
 };

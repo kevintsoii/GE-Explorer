@@ -65,13 +65,13 @@ export default gql`
     id: ID!
     officialName: String!
     name: String!
-    college: String!
-    avgRating: Float!
-    avgGrade: String!
-    avgDifficulty: Float!
-    takeAgain: Float!
-    tags: JSON!
-    reviews: [Review]!
+    college: String
+    avgRating: Float
+    avgGrade: String
+    avgDifficulty: Float
+    takeAgain: Float
+    tags: JSON
+    reviews: [Review]
   }
 
   type Review {
@@ -96,8 +96,6 @@ export default gql`
       searchTerm: String
     ): PaginatedCourseResult!
     course(identifier: String!): Course
-
-    getProfessor(id: ID): Professor
-    getProfessors(name: String, college: String): [Professor]
+    professor(college: String!, name: String!): Professor
   }
 `;

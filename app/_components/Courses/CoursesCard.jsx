@@ -24,22 +24,26 @@ const CoursesCard = ({ data }) => {
             style={{ opacity: "90%" }}
           />
         </div>
+
         <h1 className="text-lg">
           Average:{" "}
           <span
-            className={`${
-              data.avgRating
+            className={` ${
+              data.avgGrade
                 ? mapColor(mapGrade(data.avgGrade))
                 : mapColor("N/A")
             }`}
           >
             {mapGrade(data.avgGrade)}
-          </span>{" "}
+          </span>
         </h1>
 
-        <h1 className="text-lg">
-          {data.units} units - ${data.price}
-        </h1>
+        {data.units && data.price && (
+          <h1 className="text-lg">
+            {data.units} units - ${data.price}
+          </h1>
+        )}
+
         <h1 className="text-lg">
           Areas: <span className="text-blue-500">{data.areas.join(", ")}</span>
         </h1>

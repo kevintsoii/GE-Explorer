@@ -218,32 +218,20 @@ async function course(_, args) {
   return course[0];
 }
 
-async function getProfessor(parent, args) {
+async function professor(parent, args) {
   const db = await connectToDatabase();
-  if (!args.id || args.id < 0) {
+  if (
+    !args.name ||
+    args.name.trim().length <= 3 ||
+    !args.college ||
+    args.college.trim().length <= 5
+  ) {
     throw new GraphQLError("Invalid arguments");
   }
-  return await Professor.findOne({ id: args.id });
-}
-
-async function getProfessors(parent, args) {
-  const db = await connectToDatabase();
-  let query = {};
-  if (args.name && args.name.trim().length > 3) {
-    query.officialName = {
-      $regex: new RegExp(anyOrderRegex(args.name.trim()), "i"),
-    };
-  }
-  if (args.college && args.college.trim().length > 5) {
-    query.college = {
-      $regex: new RegExp(args.college.trim(), "i"),
-    };
-  }
-
-  if (Object.keys(query).length === 0) {
-    throw new GraphQLError("Invalid arguments");
-  }
-  return await Professor.find(query);
+  return await Professor.findOne({
+    officialName: args.name,
+    college: args.college,
+  });
 }
 
 const resolvers = {
@@ -251,8 +239,7 @@ const resolvers = {
   colleges,
   courses,
   course,
-  getProfessor,
-  getProfessors,
+  professor,
 };
 
 export default resolvers;

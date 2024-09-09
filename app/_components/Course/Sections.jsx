@@ -1,12 +1,34 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useLazyQuery } from "@apollo/client";
+import { useSearchParams } from "next/navigation";
 import moment from "moment";
+import { GET_PROFESSOR } from "@/app/_lib/apollo/queries";
 
+import Loader from "@/app/_components/Loader";
+import Error from "@/app/_components/Error";
 import Select from "@/app/_components/Select";
+import SectionCard from "@/app/_components/Course/SectionCard";
+import Professor from "@/app/_components/Course/Professor";
 
 const Sections = ({ college, sections }) => {
+  const searchParams = useSearchParams();
   const [sortOrder, setSortOrder] = useState("");
+  const [variables, setVariables] = useState({});
+  const [getProfessor, { loading, error, data }] = useLazyQuery(GET_PROFESSOR, {
+    variables,
+  });
+
+  useEffect(() => {
+    if (searchParams.get("college") && searchParams.get("name")) {
+      setVariables({
+        college: searchParams.get("college"),
+        name: searchParams.get("name"),
+      });
+      getProfessor();
+    }
+  }, [searchParams]);
 
   const sortedSections = () => {
     const sorted = [...sections].filter(
@@ -37,25 +59,29 @@ const Sections = ({ college, sections }) => {
         placeholder="Sort"
         options={["Average Rating", "Average Grade", "Start Date"]}
       />
-      <div className="flex mt-3 mx-[-3%]">
-        <div className="flex flex-col w-1/4 max-h-screen overflow-y-scroll gap-4">
+
+      <div className="flex mt-4 mx-[-2%]">
+        <div className="custom-scroll flex flex-col w-1/4 max-h-[200vh] overflow-y-scroll gap-4 px-2">
           {sortedSections().map((section) => (
-            <button
+            <SectionCard
               key={section.crn}
-              className="rounded-lg border border-gray-300 px-3 py-3 hover:cursor-pointer text-left"
-            >
-              <h2>{section.date}</h2>
-              <p>{section.professor}</p>
-              <p>{section.crn}</p>
-              <p>{section.seats}</p>
-              <p>{section.avgGrade}</p>
-              <p>{section.avgRating}</p>
-              <p>{section.seats_updated}</p>
-            </button>
+              section={section}
+              onClick={() => {
+                setVariables({
+                  college: college,
+                  name: section.professor,
+                });
+                getProfessor();
+              }}
+            />
           ))}
         </div>
 
-        <div className="flex w-3/4 bg-blue-200">s</div>
+        <div className="flex flex-col w-3/4 border-l border-gray-300 ml-2 pl-4">
+          {loading && <Loader />}
+          {error && <Error />}
+          {data && <Professor data={data.professor} />}
+        </div>
       </div>
     </>
   );
