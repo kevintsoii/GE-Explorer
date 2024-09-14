@@ -34,11 +34,11 @@ const colorMap = {
 const mapPercent = (percent) => {
   if (!percent) return "text-gray-200";
 
-  if (percent >= 90) {
+  if (percent >= 80) {
     return "bg-green-200";
-  } else if (percent >= 80) {
+  } else if (percent >= 65) {
     return "bg-blue-200";
-  } else if (percent >= 60) {
+  } else if (percent >= 50) {
     return "bg-amber-200";
   } else {
     return "bg-red-200";

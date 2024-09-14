@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect, useRef, useMemo } from "react";
 import { Inter } from "next/font/google";
-import { mapPercent, mapDifficulty } from "@/app/_lib/util/map";
+import { mapPercent, mapDifficulty, mapGrade } from "@/app/_lib/util/map";
+import { createGradeChart, createRatingChart } from "@/app/_lib/util/charts";
 
 import Rating from "@mui/material/Rating";
 import Chip from "@mui/material/Chip";
@@ -9,37 +10,53 @@ import Reviews from "./Reviews";
 const inter = Inter({ subsets: ["latin"] });
 
 const Professor = ({ data }) => {
-  if (!data) return <h1>No previous data.</h1>;
+  const gradeChartRef = useRef(null);
+  const ratingChartRef = useRef(null);
 
-  const filteredGrades = data.reviews
+  const filteredGrades = data?.reviews
     .filter((review) => review.grade !== null && review.grade.length <= 2)
     .map((review) => review.grade[0]);
 
-  const filteredRatings = data.reviews
+  const filteredRatings = data?.reviews
     .filter((review) => review.rating !== null)
     .map((review) => review.rating);
 
+  useEffect(() => {
+    if (filteredGrades?.length > 0) {
+      createGradeChart(filteredGrades, gradeChartRef);
+    }
+  }, [filteredGrades]);
+
+  useEffect(() => {
+    if (filteredRatings?.length > 0) {
+      createRatingChart(filteredRatings, ratingChartRef);
+    }
+  }, [filteredRatings]);
+
+  if (!data) return <h1>No previous data.</h1>;
+
   return (
     <div className="flex flex-col">
-      <div className="flex flex-col mb-7 border-gray-300 border p-5 rounded-lg shadow-lg">
+      <div className="flex flex-col mb-7 border-gray-300 border p-5 rounded-lg shadow-md">
         <div className="flex justify-between">
           <div className="flex flex-col gap-1">
             <a
               href={`https://www.ratemyprofessors.com/professor/${data.id}`}
               target="_blank"
             >
-              <h1 className="text-4xl font-medium hover:underline">
+              <h1 className="text-3xl font-medium hover:underline">
                 {data.name}
               </h1>
             </a>
 
-            <div className="flex items-center gap-6 text-3xl">
+            <div className="flex items-center gap-6 text-2xl">
               <p className="text-amber-500">
                 {data.avgRating ? data.avgRating?.toFixed(1) : "N/A"}
               </p>
 
               <div className="flex flex-col text-lg">
                 <Rating
+                  value={data.avgRating}
                   defaultValue={data.avgRating}
                   precision={0.5}
                   readOnly
@@ -83,20 +100,25 @@ const Professor = ({ data }) => {
                 <Chip
                   key={key}
                   label={`${key} (${value})`}
-                  className={`${inter.className} flex self-start`}
+                  className={`${inter.className} flex self-start text-xs`}
                 />
               ))}
           </div>
         )}
       </div>
 
-      <div className="flex divide-x-2 divide-gray-300 justify-between">
-        <div className="flex w-1/2">{filteredGrades}{data.avgRating}</div>
-        <div className="flex w-1/2">{filteredRatings}{data.avgGrade}</div>
+      <div className="flex flex-col xl:flex-row xl:divide-x gap-6 xl:gap-0 divide-gray-300 justify-between">
+        <div className="flex flex-col w-1/2 px-2 items-center">
+          <h1 className="text-xl">Grade Distribution</h1>
+          <div className="flex" ref={gradeChartRef}></div>
+        </div>
+        <div className="flex flex-col w-1/2 px-2 items-center">
+          <h1 className="text-xl">Rating Distribution</h1>
+          <div className="flex" ref={ratingChartRef}></div>
+        </div>
       </div>
 
       <Reviews reviews={data.reviews} />
-      <div>{JSON.stringify(data)}</div>
     </div>
   );
 };

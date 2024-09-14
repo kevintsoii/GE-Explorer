@@ -19,6 +19,7 @@ const CoursesCard = ({ data }) => {
           </p>
           <Rating
             defaultValue={data.avgRating}
+            value={data.avgRating}
             precision={0.5}
             readOnly
             style={{ opacity: "90%" }}

@@ -52,11 +52,11 @@ export default gql`
   }
 
   type Section {
-    date: String!
-    professor: String!
-    crn: String!
-    seats: String!
-    seats_updated: String!
+    date: String
+    professor: String
+    crn: String
+    seats: String
+    seats_updated: String
     avgRating: Float
     avgGrade: Float
   }

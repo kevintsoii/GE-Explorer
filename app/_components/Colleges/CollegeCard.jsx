@@ -9,6 +9,7 @@ const CollegeCard = ({ college, rating, ratings }) => {
         <p className="text-yellow-500">{rating.toFixed(1)}</p>
         <Rating
           defaultValue={rating}
+          value={rating}
           precision={0.5}
           readOnly
           style={{ opacity: "90%" }}

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useLazyQuery } from "@apollo/client";
 import { useSearchParams } from "next/navigation";
 import moment from "moment";
@@ -13,6 +13,7 @@ import SectionCard from "@/app/_components/Course/SectionCard";
 import Professor from "@/app/_components/Course/Professor";
 
 const Sections = ({ college, sections }) => {
+  const selectRef = useRef(null);
   const searchParams = useSearchParams();
   const [sortOrder, setSortOrder] = useState("");
   const [variables, setVariables] = useState({});
@@ -27,6 +28,10 @@ const Sections = ({ college, sections }) => {
         name: searchParams.get("name"),
       });
       getProfessor();
+      if (selectRef.current) {
+        console.log("scrolling");
+        selectRef.current.scrollIntoView({ behavior: "smooth" });
+      }
     }
   }, [searchParams]);
 
@@ -53,12 +58,14 @@ const Sections = ({ college, sections }) => {
 
   return (
     <>
-      <Select
-        sortOrder={sortOrder}
-        setSortOrder={setSortOrder}
-        placeholder="Sort"
-        options={["Average Rating", "Average Grade", "Start Date"]}
-      />
+      <div ref={selectRef} className="pt-4 -mt-4">
+        <Select
+          sortOrder={sortOrder}
+          setSortOrder={setSortOrder}
+          placeholder="Sort"
+          options={["Average Rating", "Average Grade", "Start Date"]}
+        />
+      </div>
 
       <div className="flex mt-4 mx-[-2%]">
         <div className="custom-scroll flex flex-col w-1/4 max-h-[200vh] overflow-y-scroll gap-4 px-2">
@@ -72,6 +79,9 @@ const Sections = ({ college, sections }) => {
                   name: section.professor,
                 });
                 getProfessor();
+                if (selectRef.current) {
+                  selectRef.current.scrollIntoView({ behavior: "smooth" });
+                }
               }}
             />
           ))}

@@ -15,6 +15,7 @@
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@mui/material": "^5.16.7",
+    "d3": "^7.9.0",
     "graphql": "^16.9.0",
     "graphql-tag": "^2.12.6",
     "graphql-type-json": "^0.3.2",

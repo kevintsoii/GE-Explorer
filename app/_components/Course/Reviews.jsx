@@ -42,6 +42,7 @@ const Reviews = ({ reviews }) => {
               <div className="flex flex-col gap-px">
                 <h1>{review.class}</h1>
                 <Rating
+                  value={review.rating}
                   defaultValue={review.rating}
                   precision={0.5}
                   readOnly
