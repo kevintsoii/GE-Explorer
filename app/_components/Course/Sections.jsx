@@ -78,10 +78,10 @@ const Sections = ({ college, sections }) => {
                   college: college,
                   name: section.professor,
                 });
-                getProfessor();
                 if (selectRef.current) {
                   selectRef.current.scrollIntoView({ behavior: "smooth" });
                 }
+                getProfessor();
               }}
             />
           ))}

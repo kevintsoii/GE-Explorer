@@ -55,7 +55,7 @@ const Course = ({ identifier }) => {
               data.course.identifier.split(":")[0]
             }&filter[transferability][]=articulation`}
           >
-            <button className="flex items-center gap-2 border-blue-500 border px-4 py-3 rounded-lg">
+            <button className="flex items-center gap-2 border-blue-500 border px-4 py-3 rounded-lg hover:border-black">
               View on CVC
               <SquareArrowOutUpRight size={15} />
             </button>

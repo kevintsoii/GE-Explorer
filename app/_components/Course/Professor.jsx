@@ -50,7 +50,7 @@ const Professor = ({ data }) => {
             </a>
 
             <div className="flex items-center gap-6 text-2xl">
-              <p className="text-amber-500">
+              <p className="text-amber-500 text-3xl">
                 {data.avgRating ? data.avgRating?.toFixed(1) : "N/A"}
               </p>
 
