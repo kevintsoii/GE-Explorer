@@ -1,10 +1,20 @@
 import GraphQLJSON from "graphql-type-json";
 import { ApolloServer } from "@apollo/server";
 import { startServerAndCreateNextHandler } from "@as-integrations/next";
+import { getApps, initializeApp, cert } from "firebase-admin/app";
+import { getAuth } from "firebase-admin/auth";
 
 import typeDefs from "@/app/_lib/apollo/schema";
 import { dateScalar } from "@/app/_lib/apollo/scalars";
 import queryResolvers from "@/app/_lib/apollo/resolvers";
+
+const firebaseAdminConfig = JSON.parse(process.env.FIREBASE_ADMIN);
+
+if (getApps().length === 0) {
+  initializeApp({
+    credential: cert(firebaseAdminConfig),
+  });
+}
 
 const resolvers = {
   JSON: GraphQLJSON,
@@ -27,8 +37,20 @@ const server = new ApolloServer({
 });
 
 const handler = startServerAndCreateNextHandler(server, {
-  context: async ({ req, res }) => {
-    return true;
+  context: async (req, res) => {
+    const authHeader = req.headers.get("authorization");
+
+    if (authHeader) {
+      const token = authHeader.split("Bearer ")[1];
+      try {
+        const decodedToken = await getAuth().verifyIdToken(token);
+        return { user: decodedToken };
+      } catch (error) {
+        console.error("Error verifying Firebase token:", error);
+      }
+    }
+
+    return { user: null };
   },
 });
 

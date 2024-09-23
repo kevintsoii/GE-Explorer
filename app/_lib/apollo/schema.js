@@ -85,6 +85,10 @@ export default gql`
     grade: String
   }
 
+  type Bookmark {
+    id: String!
+  }
+
   type Query {
     areas: [Area]!
     colleges: [College]!
@@ -97,5 +101,6 @@ export default gql`
     ): PaginatedCourseResult!
     course(identifier: String!): Course
     professor(college: String!, name: String!): Professor
+    bookmarks: [Bookmark]
   }
 `;

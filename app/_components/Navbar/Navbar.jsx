@@ -29,12 +29,11 @@ const Navbar = () => {
             <NavbarButton text="Courses" redirect="/courses" />
           </ul>
           <div className="h-8 divider border-l border-gray-300 mx-3"></div>
-          {!loading &&
-            (authUser ? (
-              <NavbarButton text="Saved" redirect="/saved" />
-            ) : (
-              <LoginButton />
-            ))}
+          {authUser ? (
+            <NavbarButton text="Saved" redirect="/saved" />
+          ) : (
+            <LoginButton />
+          )}
         </div>
       </div>
 

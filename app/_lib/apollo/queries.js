@@ -121,6 +121,14 @@ const GET_PROFESSOR = gql`
   }
 `;
 
+const GET_BOOKMARKS = gql`
+  query Query {
+    bookmarks {
+      id
+    }
+  }
+`;
+
 export {
   GET_AREAS,
   GET_AREA_NAMES,
@@ -129,4 +137,5 @@ export {
   GET_COURSES,
   GET_COURSE,
   GET_PROFESSOR,
+  GET_BOOKMARKS,
 };

@@ -1,7 +1,9 @@
-import React, { useEffect, useRef, useMemo } from "react";
+import React, { useEffect, useRef } from "react";
 import { Inter } from "next/font/google";
-import { mapPercent, mapDifficulty, mapGrade } from "@/app/_lib/util/map";
+import { mapPercent, mapDifficulty } from "@/app/_lib/util/map";
 import { createGradeChart, createRatingChart } from "@/app/_lib/util/charts";
+
+import { Bookmark } from "lucide-react";
 
 import Rating from "@mui/material/Rating";
 import Chip from "@mui/material/Chip";
@@ -32,6 +34,8 @@ const Professor = ({ data }) => {
       createRatingChart(filteredRatings, ratingChartRef);
     }
   }, [filteredRatings]);
+
+  const saveBookmark = async () => {};
 
   if (!data) return <h1>No previous data.</h1>;
 
@@ -67,7 +71,7 @@ const Professor = ({ data }) => {
             </div>
           </div>
 
-          <div className="flex gap-12 mr-12">
+          <div className="flex gap-12">
             <div
               className={`flex flex-col items-center self-start rounded-lg p-3 ${mapPercent(
                 data.takeAgain
@@ -89,6 +93,12 @@ const Professor = ({ data }) => {
               </h1>
               <p>difficulty level</p>
             </div>
+            <button
+              className="flex flex-col items-center self-start rounded-lg p-2 hover:bg-gray-100 text-blue-500 active:scale-[0.95]"
+              onClick={saveBookmark}
+            >
+              <Bookmark size={30} />
+            </button>
           </div>
         </div>
 

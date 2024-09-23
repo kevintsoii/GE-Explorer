@@ -2,7 +2,6 @@ import { GraphQLError } from "graphql";
 import { ObjectId } from "mongodb";
 import connectToDatabase from "../mongoose/mongoose";
 import Professor from "../mongoose/models/professor";
-import { anyOrderRegex } from "../util/search";
 
 async function areas() {
   const db = await connectToDatabase();
@@ -219,7 +218,6 @@ async function course(_, args) {
 }
 
 async function professor(parent, args) {
-  const db = await connectToDatabase();
   if (
     !args.name ||
     args.name.trim().length <= 3 ||
@@ -228,10 +226,16 @@ async function professor(parent, args) {
   ) {
     throw new GraphQLError("Invalid arguments");
   }
+
   return await Professor.findOne({
     officialName: args.name,
     college: args.college,
   });
+}
+
+async function bookmarks(parent, args, context) {
+  console.log("graphql api", context.user.email);
+  return [];
 }
 
 const resolvers = {
@@ -240,6 +244,7 @@ const resolvers = {
   courses,
   course,
   professor,
+  bookmarks,
 };
 
 export default resolvers;

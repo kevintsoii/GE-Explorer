@@ -2,10 +2,14 @@ import { useState, useEffect } from "react";
 import { auth } from "./clientApp";
 import { onAuthStateChanged as _onAuthStateChanged } from "firebase/auth";
 
-const formatAuthUser = (user) => ({
-  uid: user.uid,
-  email: user.email,
-});
+const formatAuthUser = async (user) => {
+  const token = await user.getIdToken();
+  return {
+    uid: user.uid,
+    email: user.email,
+    token,
+  };
+};
 
 export default function useAuth() {
   const [authUser, setAuthUser] = useState(null);
@@ -16,7 +20,7 @@ export default function useAuth() {
     if (!authState) {
       setAuthUser(null);
     } else {
-      setAuthUser(formatAuthUser(authState));
+      setAuthUser(await formatAuthUser(authState));
     }
     setLoading(false);
   };
