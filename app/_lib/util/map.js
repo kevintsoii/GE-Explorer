@@ -32,7 +32,7 @@ const colorMap = {
 };
 
 const mapPercent = (percent) => {
-  if (!percent) return "text-gray-200";
+  if (!percent) return "bg-gray-200";
 
   if (percent >= 80) {
     return "bg-green-200";
@@ -46,7 +46,7 @@ const mapPercent = (percent) => {
 };
 
 const mapDifficulty = (difficulty) => {
-  if (!difficulty) return "text-gray-200";
+  if (!difficulty) return "bg-gray-200";
 
   if (difficulty <= 2) {
     return "bg-green-200";

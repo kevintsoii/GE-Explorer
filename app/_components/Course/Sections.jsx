@@ -12,7 +12,7 @@ import Select from "@/app/_components/Select";
 import SectionCard from "@/app/_components/Course/SectionCard";
 import Professor from "@/app/_components/Course/Professor";
 
-const Sections = ({ college, sections }) => {
+const Sections = ({ college, sections, identifier }) => {
   const selectRef = useRef(null);
   const searchParams = useSearchParams();
   const [sortOrder, setSortOrder] = useState("");
@@ -76,6 +76,7 @@ const Sections = ({ college, sections }) => {
                 setVariables({
                   college: college,
                   name: section.professor,
+                  crn: section.crn,
                 });
                 if (selectRef.current) {
                   selectRef.current.scrollIntoView({ behavior: "smooth" });
@@ -89,7 +90,12 @@ const Sections = ({ college, sections }) => {
         <div className="flex flex-col w-3/4 border-l border-gray-300 ml-2 pl-4">
           {loading && <Loader />}
           {error && <Error />}
-          {data && <Professor data={data.professor} />}
+          {data && (
+            <Professor
+              data={data.professor}
+              identifier={`${identifier}|${variables.crn}`}
+            />
+          )}
         </div>
       </div>
     </>

@@ -3,11 +3,12 @@ import { auth } from "./clientApp";
 import { onAuthStateChanged as _onAuthStateChanged } from "firebase/auth";
 
 const formatAuthUser = async (user) => {
-  const token = await user.getIdToken();
   return {
     uid: user.uid,
     email: user.email,
-    token,
+    token: async () => {
+      return await user.getIdToken();
+    },
   };
 };
 

@@ -123,9 +123,19 @@ const GET_PROFESSOR = gql`
 
 const GET_BOOKMARKS = gql`
   query Query {
-    bookmarks {
-      id
-    }
+    bookmarks
+  }
+`;
+
+const ADD_BOOKMARK = gql`
+  mutation Mutation($id: String!) {
+    addBookmark(id: $id)
+  }
+`;
+
+const REMOVE_BOOKMARK = gql`
+  mutation Mutation($id: String!) {
+    removeBookmark(id: $id)
   }
 `;
 
@@ -138,4 +148,6 @@ export {
   GET_COURSE,
   GET_PROFESSOR,
   GET_BOOKMARKS,
+  ADD_BOOKMARK,
+  REMOVE_BOOKMARK,
 };

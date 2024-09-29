@@ -6,7 +6,8 @@ import { getAuth } from "firebase-admin/auth";
 
 import typeDefs from "@/app/_lib/apollo/schema";
 import { dateScalar } from "@/app/_lib/apollo/scalars";
-import queryResolvers from "@/app/_lib/apollo/resolvers";
+import queryResolvers from "@/app/_lib/apollo/queryResolvers";
+import mutationResolvers from "@/app/_lib/apollo/mutationResolvers";
 
 const firebaseAdminConfig = JSON.parse(process.env.FIREBASE_ADMIN);
 
@@ -21,6 +22,7 @@ const resolvers = {
   Date: dateScalar,
 
   Query: { ...queryResolvers },
+  Mutation: { ...mutationResolvers },
 };
 
 const server = new ApolloServer({

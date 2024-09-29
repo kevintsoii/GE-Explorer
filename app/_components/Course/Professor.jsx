@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { Inter } from "next/font/google";
 import { mapPercent, mapDifficulty } from "@/app/_lib/util/map";
 import { createGradeChart, createRatingChart } from "@/app/_lib/util/charts";
+import { useBookmarks } from "@/app/_lib/contexts/BookmarksContext";
 
 import { Bookmark } from "lucide-react";
 
@@ -11,9 +12,10 @@ import Reviews from "./Reviews";
 
 const inter = Inter({ subsets: ["latin"] });
 
-const Professor = ({ data }) => {
+const Professor = ({ data, identifier }) => {
   const gradeChartRef = useRef(null);
   const ratingChartRef = useRef(null);
+  const { bookmarks, addBookmark, removeBookmark } = useBookmarks();
 
   const filteredGrades = data?.reviews
     .filter((review) => review.grade !== null && review.grade.length <= 2)
@@ -24,18 +26,20 @@ const Professor = ({ data }) => {
     .map((review) => review.rating);
 
   useEffect(() => {
-    if (filteredGrades?.length > 0) {
-      createGradeChart(filteredGrades, gradeChartRef);
-    }
+    createGradeChart(filteredGrades || [], gradeChartRef);
   }, [filteredGrades]);
 
   useEffect(() => {
-    if (filteredRatings?.length > 0) {
-      createRatingChart(filteredRatings, ratingChartRef);
-    }
+    createRatingChart(filteredRatings || [], ratingChartRef);
   }, [filteredRatings]);
 
-  const saveBookmark = async () => {};
+  const toggleBookmark = async () => {
+    if (bookmarks?.includes(identifier)) {
+      removeBookmark(identifier);
+    } else {
+      addBookmark(identifier);
+    }
+  };
 
   if (!data) return <h1>No previous data.</h1>;
 
@@ -95,9 +99,17 @@ const Professor = ({ data }) => {
             </div>
             <button
               className="flex flex-col items-center self-start rounded-lg p-2 hover:bg-gray-100 text-blue-500 active:scale-[0.95]"
-              onClick={saveBookmark}
+              onClick={toggleBookmark}
             >
-              <Bookmark size={30} />
+              <Bookmark
+                size={30}
+                style={{
+                  fill:
+                    bookmarks && bookmarks.includes(identifier)
+                      ? "currentColor"
+                      : "",
+                }}
+              />
             </button>
           </div>
         </div>

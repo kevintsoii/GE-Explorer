@@ -68,6 +68,7 @@ const Course = ({ identifier }) => {
             <Sections
               college={data.course.college}
               sections={data.course.sections}
+              identifier={data.course.identifier}
             />
           )}
         </>
