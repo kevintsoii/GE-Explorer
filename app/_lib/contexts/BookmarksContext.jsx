@@ -23,7 +23,6 @@ export const BookmarksProvider = ({ children }) => {
       }
 
       try {
-        console.log(authUser);
         await getBookmarks({
           context: {
             headers: {

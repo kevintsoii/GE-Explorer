@@ -2,6 +2,7 @@ import { GraphQLError } from "graphql";
 import { ObjectId } from "mongodb";
 import connectToDatabase from "../mongoose/mongoose";
 import Professor from "../mongoose/models/professor";
+import User from "../mongoose/models/user";
 
 async function areas() {
   const db = await connectToDatabase();
@@ -234,8 +235,12 @@ async function professor(parent, args) {
 }
 
 async function bookmarks(parent, args, context) {
-  console.log("graphql api", context.user.email);
-  return [];
+  if (!context.user || !context.user.email) {
+    throw new GraphQLError("Unauthorized");
+  }
+
+  const user = await User.findOne({ email: context.user.email });
+  return user?.bookmarks || [];
 }
 
 const resolvers = {

@@ -29,7 +29,6 @@ const Sections = ({ college, sections }) => {
       });
       getProfessor();
       if (selectRef.current) {
-        console.log("scrolling");
         selectRef.current.scrollIntoView({ behavior: "smooth" });
       }
     }
