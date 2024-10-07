@@ -22,10 +22,15 @@ const Sections = ({ college, sections, identifier }) => {
   });
 
   useEffect(() => {
-    if (searchParams.get("college") && searchParams.get("name")) {
+    if (
+      searchParams.get("college") &&
+      searchParams.get("name") &&
+      searchParams.get("crn")
+    ) {
       setVariables({
         college: searchParams.get("college"),
         name: searchParams.get("name"),
+        crn: searchParams.get("crn"),
       });
       getProfessor();
       if (selectRef.current) {

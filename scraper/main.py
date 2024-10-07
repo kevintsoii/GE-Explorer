@@ -61,6 +61,7 @@ def save_courses():
     cc_sections.create_index("identifier", unique=True)
     cc_sections.create_index("college")
     cc_sections.create_index("sections.professor")
+    cc_sections.create_index("sections.crn")
     
     csu_ges = load_csu_ges([], year_id=75, current_term="F2024")
     transferrable = {}

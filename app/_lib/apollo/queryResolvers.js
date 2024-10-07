@@ -243,6 +243,102 @@ async function bookmarks(parent, args, context) {
   return user?.bookmarks || [];
 }
 
+async function bookmarkInfo(parent, args, context) {
+  if (!context.user || !context.user.email) {
+    throw new GraphQLError("Unauthorized");
+  }
+
+  const user = await User.findOne({ email: context.user.email });
+  const bookmarks = user?.bookmarks || [];
+
+  let queries = [];
+  let crns = [];
+  for (const bookmark of bookmarks) {
+    const [course, crn] = bookmark.split("|");
+    queries.push({
+      identifier: course,
+    });
+    crns.push(crn);
+  }
+
+  const db = await connectToDatabase();
+
+  const results = await db
+    .collection("cc-courses")
+    .aggregate([
+      {
+        $match: { $or: queries },
+      },
+      {
+        $project: {
+          identifier: 1,
+          college: 1,
+          course: 1,
+          title: 1,
+          areas: 1,
+          sections: {
+            $filter: {
+              input: "$sections",
+              as: "section",
+              cond: { $in: ["$$section.crn", crns] },
+            },
+          },
+        },
+      },
+      {
+        $unwind: "$sections",
+      },
+      {
+        $lookup: {
+          from: "cc-professors",
+          let: {
+            professorName: "$sections.professor",
+            collegeName: "$college",
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$officialName", "$$professorName"] },
+                    { $eq: ["$college", "$$collegeName"] },
+                  ],
+                },
+              },
+            },
+            { $limit: 1 },
+          ],
+          as: "professorDetails",
+        },
+      },
+      {
+        $unwind: {
+          path: "$professorDetails",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $project: {
+          identifier: 1,
+          id: "$professorDetails.id",
+          officialName: "$professorDetails.officialName",
+          college: "$professorDetails.college",
+          avgRating: "$professorDetails.avgRating",
+          avgGrade: "$professorDetails.avgGrade",
+          avgDifficulty: "$professorDetails.avgDifficulty",
+          takeAgain: "$professorDetails.takeAgain",
+          class: { $concat: ["$course", " - ", "$title"] },
+          crn: "$sections.crn",
+          areas: "$areas",
+        },
+      },
+    ])
+    .toArray();
+  console.log(results);
+
+  return results;
+}
+
 const resolvers = {
   areas,
   colleges,
@@ -250,6 +346,7 @@ const resolvers = {
   course,
   professor,
   bookmarks,
+  bookmarkInfo,
 };
 
 export default resolvers;

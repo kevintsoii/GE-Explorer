@@ -72,6 +72,11 @@ export default gql`
     takeAgain: Float
     tags: JSON
     reviews: [Review]
+
+    class: String
+    identifier: String
+    areas: [String]
+    crn: String
   }
 
   type Review {
@@ -97,7 +102,9 @@ export default gql`
     ): PaginatedCourseResult!
     course(identifier: String!): Course
     professor(college: String!, name: String!): Professor
+
     bookmarks: [String]!
+    bookmarkInfo: [Professor]!
   }
 
   type Mutation {

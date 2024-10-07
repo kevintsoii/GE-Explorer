@@ -7,13 +7,30 @@ async function addBookmark(parent, args, context) {
   }
 
   try {
+    const user = await User.findOne({ email: context.user.email });
+
+    if (!user) {
+      throw new GraphQLError("User not found");
+    }
+
+    let bookmarks = user.bookmarks || [];
+
+    if (!bookmarks.includes(args.id)) {
+      if (bookmarks.length >= 20) {
+        bookmarks.shift();
+      }
+      bookmarks.push(args.id);
+    }
+
     await User.findOneAndUpdate(
       { email: context.user.email },
-      { $addToSet: { bookmarks: args.id } },
+      { bookmarks: bookmarks },
       { new: true, upsert: true }
     );
+
     return true;
-  } catch {
+  } catch (error) {
+    console.error(error);
     return false;
   }
 }

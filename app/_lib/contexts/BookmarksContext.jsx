@@ -15,17 +15,22 @@ export const useBookmarks = () => {
 };
 
 export const BookmarksProvider = ({ children }) => {
+  const [loading, setLoading] = useState(true);
   const [bookmarks, setBookmarks] = useState([]);
   const { authUser, loading: authLoading } = useAuth();
 
-  const [getBookmarks, { loading, error, data }] = useLazyQuery(GET_BOOKMARKS);
+  const [getBookmarks, { _, error, data }] = useLazyQuery(GET_BOOKMARKS);
   const [addBookmarkMutation] = useMutation(ADD_BOOKMARK);
   const [removeBookmarkMutation] = useMutation(REMOVE_BOOKMARK);
 
   useEffect(() => {
     const fetchBookmarks = async () => {
-      if (authLoading || !authUser) {
+      if (authLoading) {
+        return;
+      }
+      if (!authUser) {
         setBookmarks([]);
+        setLoading(false);
         return;
       }
 
@@ -40,7 +45,9 @@ export const BookmarksProvider = ({ children }) => {
         setBookmarks(data.bookmarks);
       } catch (error) {
         console.error("Error fetching bookmarks:", error);
+        setBookmarks([]);
       }
+      setLoading(false);
     };
 
     fetchBookmarks();
@@ -62,7 +69,11 @@ export const BookmarksProvider = ({ children }) => {
       if (data.addBookmark) {
         setBookmarks((previousBookmarks) => {
           const updatedBookmarks = new Set([...previousBookmarks, id]);
-          return Array.from(updatedBookmarks);
+          const bookmarksArray = Array.from(updatedBookmarks);
+          if (bookmarksArray.length > 20) {
+            return bookmarksArray.slice(-20);
+          }
+          return bookmarksArray;
         });
       }
     } catch (error) {
@@ -95,7 +106,7 @@ export const BookmarksProvider = ({ children }) => {
 
   return (
     <BookmarksContext.Provider
-      value={{ bookmarks, addBookmark, removeBookmark }}
+      value={{ loading, bookmarks, addBookmark, removeBookmark }}
     >
       {children}
     </BookmarksContext.Provider>

@@ -1,11 +1,12 @@
 import React from "react";
 import Rating from "@mui/material/Rating";
 import { mapGrade, mapColor } from "../../_lib/util/map";
+import Link from "next/link";
 
 const CoursesCard = ({ data }) => {
   return (
     <div className="flex flex-col border rounded-lg min-h-24 py-4 px-4 hover:border-blue-500">
-      <a href={`/course/${data.identifier}`} target="_blank">
+      <Link href={`/course/${data.identifier}`}>
         <h1 className="text-xl font-bold">
           {data.course} - {data.title}
         </h1>
@@ -48,7 +49,7 @@ const CoursesCard = ({ data }) => {
         <h1 className="text-lg">
           Areas: <span className="text-blue-500">{data.areas.join(", ")}</span>
         </h1>
-      </a>
+      </Link>
     </div>
   );
 };

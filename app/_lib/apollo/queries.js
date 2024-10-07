@@ -139,6 +139,25 @@ const REMOVE_BOOKMARK = gql`
   }
 `;
 
+const GET_BOOKMARK_INFO = gql`
+  query BookmarkInfo {
+    bookmarkInfo {
+      id
+      officialName
+      college
+      avgRating
+      avgGrade
+      avgDifficulty
+      takeAgain
+
+      class
+      crn
+      identifier
+      areas
+    }
+  }
+`;
+
 export {
   GET_AREAS,
   GET_AREA_NAMES,
@@ -150,4 +169,5 @@ export {
   GET_BOOKMARKS,
   ADD_BOOKMARK,
   REMOVE_BOOKMARK,
+  GET_BOOKMARK_INFO,
 };
