@@ -7,10 +7,10 @@ async function addBookmark(parent, args, context) {
   }
 
   try {
-    const user = await User.findOne({ email: context.user.email });
+    let user = await User.findOne({ email: context.user.email });
 
     if (!user) {
-      throw new GraphQLError("User not found");
+      user = new User({ email: context.user.email, bookmarks: [] });
     }
 
     let bookmarks = user.bookmarks || [];

@@ -45,6 +45,20 @@ const mapPercent = (percent) => {
   }
 };
 
+const mapPercentage = (percent) => {
+  if (!percent) return "text-gray-200";
+
+  if (percent >= 80) {
+    return "text-green-500";
+  } else if (percent >= 65) {
+    return "text-amber-500";
+  } else if (percent >= 50) {
+    return "text-amber-500";
+  } else {
+    return "text-red-500";
+  }
+};
+
 const mapDifficulty = (difficulty) => {
   if (!difficulty) return "bg-gray-200";
 
@@ -80,4 +94,4 @@ function mapColor(grade) {
   return colorMap[grade] || "text-gray-500";
 }
 
-export { mapGrade, mapColor, mapPercent, mapDifficulty };
+export { mapGrade, mapColor, mapPercent, mapDifficulty, mapPercentage };

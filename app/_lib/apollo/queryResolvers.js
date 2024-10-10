@@ -288,6 +288,7 @@ async function bookmarkInfo(parent, args, context) {
       {
         $unwind: "$sections",
       },
+
       {
         $lookup: {
           from: "cc-professors",
@@ -334,9 +335,12 @@ async function bookmarkInfo(parent, args, context) {
       },
     ])
     .toArray();
-  console.log(results);
 
-  return results;
+  const uniqueResults = Array.from(
+    new Map(results.map((item) => [item.identifier + item.crn, item])).values()
+  );
+
+  return uniqueResults;
 }
 
 const resolvers = {
