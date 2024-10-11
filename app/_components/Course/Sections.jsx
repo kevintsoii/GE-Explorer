@@ -11,12 +11,15 @@ import Error from "@/app/_components/Error";
 import Select from "@/app/_components/Select";
 import SectionCard from "@/app/_components/Course/SectionCard";
 import Professor from "@/app/_components/Course/Professor";
+import Modal from "@/app/_components/Modal";
 
 const Sections = ({ college, sections, identifier }) => {
   const selectRef = useRef(null);
+
   const searchParams = useSearchParams();
   const [sortOrder, setSortOrder] = useState("");
   const [variables, setVariables] = useState({});
+  const [modalActive, setModalActive] = useState(false);
   const [getProfessor, { loading, error, data }] = useLazyQuery(GET_PROFESSOR, {
     variables,
   });
@@ -71,8 +74,8 @@ const Sections = ({ college, sections, identifier }) => {
         />
       </div>
 
-      <div className="flex mt-4 mx-[-2%]">
-        <div className="custom-scroll flex flex-col w-1/4 max-h-[200vh] overflow-y-scroll gap-4 px-2">
+      <div className="flex mt-4 xl:mx-[-2%] lg:mx-[-10%]">
+        <div className="hidden lg:flex custom-scroll flex flex-col lg:w-1/4 max-h-[200vh] overflow-y-scroll gap-4 px-2">
           {sortedSections().map((section) => (
             <SectionCard
               key={section.crn}
@@ -91,8 +94,36 @@ const Sections = ({ college, sections, identifier }) => {
             />
           ))}
         </div>
+        <div className="lg:hidden flex flex-col gap-4 w-full">
+          {sortedSections().map((section) => (
+            <>
+              <SectionCard
+                key={section.crn}
+                section={section}
+                onClick={(event) => {
+                  setVariables({
+                    college: college,
+                    name: section.professor,
+                    crn: section.crn,
+                  });
+                  getProfessor();
 
-        <div className="flex flex-col w-3/4 border-l border-gray-300 ml-2 pl-4">
+                  setModalActive(true);
+                }}
+              />
+            </>
+          ))}
+        </div>
+        <Modal isOpen={modalActive} onClose={() => setModalActive(false)}>
+          {data && (
+            <Professor
+              data={data.professor}
+              identifier={`${identifier}|${variables.crn}`}
+            />
+          )}
+        </Modal>
+
+        <div className="hidden lg:flex flex-col lg:w-3/4 border-l border-gray-300 ml-2 pl-4">
           {loading && <Loader />}
           {error && <Error />}
           {data && (

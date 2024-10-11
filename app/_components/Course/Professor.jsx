@@ -46,33 +46,47 @@ const Professor = ({ data, identifier }) => {
   return (
     <div className="flex flex-col">
       <div className="flex flex-col mb-7 border-gray-300 border p-5 rounded-lg shadow-md">
-        <div className="flex justify-between">
-          <div className="flex flex-col gap-1">
-            <a
-              href={`https://www.ratemyprofessors.com/professor/${data.id}`}
-              target="_blank"
-            >
-              <h1 className="text-3xl font-medium hover:underline">
-                {data.name}
-              </h1>
-            </a>
-
-            <div className="flex items-center gap-6 text-2xl">
-              <p className="text-amber-500 text-3xl">
-                {data.avgRating ? data.avgRating?.toFixed(1) : "N/A"}
-              </p>
-
-              <div className="flex flex-col text-lg">
-                <Rating
-                  value={data.avgRating}
-                  defaultValue={data.avgRating}
-                  precision={0.5}
-                  readOnly
-                  style={{ opacity: "90%" }}
-                />
-                <p>{data.reviews.length} reviews</p>
+        <div className="flex flex-col lg:flex-row gap-3 lg:gap-0 mb-3 lg:mb-0 justify-between">
+          <div className="flex justify-between">
+            <div className="flex flex-col gap-1">
+              <a
+                href={`https://www.ratemyprofessors.com/professor/${data.id}`}
+                target="_blank"
+              >
+                <h1 className="text-2xl xl:text-3xl font-medium hover:underline">
+                  {data.name}
+                </h1>
+              </a>
+              <div className="flex items-center gap-6 text-2xl">
+                <p className="text-amber-500 text-2xl xl:text-3xl">
+                  {data.avgRating ? data.avgRating?.toFixed(1) : "N/A"}
+                </p>
+                <div className="flex flex-col text-lg">
+                  <Rating
+                    value={data.avgRating}
+                    defaultValue={data.avgRating}
+                    precision={0.5}
+                    readOnly
+                    style={{ opacity: "90%" }}
+                  />
+                  <p>{data.reviews.length} reviews</p>
+                </div>
               </div>
             </div>
+            <button
+              className="flex lg:hidden flex-col items-center self-start rounded-lg p-2 hover:bg-gray-100 text-blue-500 active:scale-[0.95]"
+              onClick={toggleBookmark}
+            >
+              <Bookmark
+                size={30}
+                style={{
+                  fill:
+                    bookmarks && bookmarks.includes(identifier)
+                      ? "currentColor"
+                      : "",
+                }}
+              />
+            </button>
           </div>
 
           <div className="flex gap-12">
@@ -82,7 +96,7 @@ const Professor = ({ data, identifier }) => {
               )}`}
             >
               <h1 className="text-2xl">{Math.round(data.takeAgain)}%</h1>
-              <p>would take again</p>
+              <p>would retake</p>
             </div>
             <div
               className={`flex flex-col items-center self-start rounded-lg p-3 ${mapDifficulty(
@@ -98,7 +112,7 @@ const Professor = ({ data, identifier }) => {
               <p>difficulty level</p>
             </div>
             <button
-              className="flex flex-col items-center self-start rounded-lg p-2 hover:bg-gray-100 text-blue-500 active:scale-[0.95]"
+              className="hidden lg:flex flex-col items-center self-start rounded-lg p-2 hover:bg-gray-100 text-blue-500 active:scale-[0.95]"
               onClick={toggleBookmark}
             >
               <Bookmark
@@ -129,14 +143,20 @@ const Professor = ({ data, identifier }) => {
         )}
       </div>
 
-      <div className="flex flex-col xl:flex-row xl:divide-x gap-6 xl:gap-0 divide-gray-300 justify-between">
-        <div className="flex flex-col w-1/2 px-2 items-center">
+      <div className="flex flex-col xl:flex-row xl:divide-x gap-6 xl:gap-0 divide-gray-300 justify-between lg:mr-0 mr-[4%]">
+        <div className="flex flex-col w-full lg:w-1/2 px-2 items-center">
           <h1 className="text-xl">Grade Distribution</h1>
-          <div className="flex" ref={gradeChartRef}></div>
+          <div
+            className="flex scale-[85%] lg:scale-100"
+            ref={gradeChartRef}
+          ></div>
         </div>
-        <div className="flex flex-col w-1/2 px-2 items-center">
+        <div className="flex flex-col w-full lg:w-1/2 px-2 items-center">
           <h1 className="text-xl">Rating Distribution</h1>
-          <div className="flex" ref={ratingChartRef}></div>
+          <div
+            className="flex scale-[85%] lg:scale-100"
+            ref={ratingChartRef}
+          ></div>
         </div>
       </div>
 

@@ -32,7 +32,7 @@ const Reviews = ({ reviews }) => {
         <LeaveReview />
       </div>
 
-      <div className="custom-scroll max-h-[200vh] overflow-y-scroll grid grid-cols-2 gap-4 pr-2">
+      <div className="custom-scroll max-h-[200vh] overflow-y-scroll grid lg:grid-cols-2 gap-4 pr-2">
         {reviews.map((review, index) => (
           <div
             key={index}
