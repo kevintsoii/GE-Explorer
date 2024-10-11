@@ -149,6 +149,10 @@ const GET_BOOKMARK_INFO = gql`
       avgGrade
       avgDifficulty
       takeAgain
+      reviews {
+        grade
+        rating
+      }
 
       class
       crn

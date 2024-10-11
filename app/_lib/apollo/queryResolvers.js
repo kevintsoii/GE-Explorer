@@ -288,7 +288,6 @@ async function bookmarkInfo(parent, args, context) {
       {
         $unwind: "$sections",
       },
-
       {
         $lookup: {
           from: "cc-professors",
@@ -325,6 +324,7 @@ async function bookmarkInfo(parent, args, context) {
           officialName: "$professorDetails.officialName",
           college: "$professorDetails.college",
           avgRating: "$professorDetails.avgRating",
+          reviews: "$professorDetails.reviews",
           avgGrade: "$professorDetails.avgGrade",
           avgDifficulty: "$professorDetails.avgDifficulty",
           takeAgain: "$professorDetails.takeAgain",
