@@ -116,6 +116,7 @@ const GET_PROFESSOR = gql`
         tags
         takeAgain
         grade
+        id
       }
     }
   }
@@ -162,6 +163,42 @@ const GET_BOOKMARK_INFO = gql`
   }
 `;
 
+const GET_USER_REVIEWS = gql`
+  query Query {
+    reviews
+  }
+`;
+
+const ADD_REVIEW = gql`
+  mutation Mutation(
+    $class: String!
+    $comment: String!
+    $difficulty: Int!
+    $rating: Int!
+    $tags: [String]!
+    $takeAgain: Boolean!
+    $grade: String!
+    $professorId: String!
+  ) {
+    addReview(
+      class: $class
+      comment: $comment
+      difficulty: $difficulty
+      rating: $rating
+      tags: $tags
+      takeAgain: $takeAgain
+      grade: $grade
+      professorId: $professorId
+    )
+  }
+`;
+
+const REMOVE_REVIEW = gql`
+  mutation Mutation($id: String!) {
+    removeReview(id: $id)
+  }
+`;
+
 export {
   GET_AREAS,
   GET_AREA_NAMES,
@@ -174,4 +211,7 @@ export {
   ADD_BOOKMARK,
   REMOVE_BOOKMARK,
   GET_BOOKMARK_INFO,
+  GET_USER_REVIEWS,
+  ADD_REVIEW,
+  REMOVE_REVIEW,
 };

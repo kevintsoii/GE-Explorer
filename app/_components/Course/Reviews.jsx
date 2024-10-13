@@ -1,9 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import { mapColor } from "@/app/_lib/util/map";
+import { useReviews } from "@/app/_lib/contexts/ReviewsContext";
 
 import Rating from "@mui/material/Rating";
 import Divider from "@/app/_components/Divider";
-import LeaveReview from "./LeaveReview";
+import Modal from "./ReviewModal";
+import Tooltip from "@mui/material/Tooltip";
+import { MessageCirclePlus, Pencil, Trash2 } from "lucide-react";
 
 const formatTimestamp = (timestamp) => {
   const date = new Date(timestamp);
@@ -22,18 +25,48 @@ const formatTimestamp = (timestamp) => {
   return formattedDate;
 };
 
-const Reviews = ({ reviews }) => {
+const Reviews = ({ reviews, professorInfo, refresh }) => {
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalPresets, setModalPresets] = useState({});
+  const { reviews: userReviews, removeReview } = useReviews();
+
+  const reviewsSorted = reviews?.slice().sort((a, b) => {
+    if (a.date === null) return 1;
+    if (b.date === null) return -1;
+    return new Date(b.date) - new Date(a.date);
+  });
+
   return (
     <>
       <Divider />
+      <Modal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        professorInfo={professorInfo}
+        refresh={refresh}
+        presets={modalPresets}
+      />
 
       <div className="gap-3 flex justify-between">
         <h1 className="text-xl my-3">Reviews ({reviews.length})</h1>
-        <LeaveReview />
+        <div className="flex items-center">
+          <Tooltip title="Leave a Review" placement="top">
+            <button
+              onClick={() => {
+                setModalOpen(true);
+              }}
+            >
+              <MessageCirclePlus
+                className="text-blue-500 mb-2 active:scale-95"
+                size={24}
+              />
+            </button>
+          </Tooltip>
+        </div>
       </div>
 
       <div className="custom-scroll max-h-[200vh] overflow-y-scroll grid lg:grid-cols-2 gap-4 pr-2">
-        {reviews.map((review, index) => (
+        {reviewsSorted.map((review, index) => (
           <div
             key={index}
             className="flex flex-col gap-2 border border-gray-300 p-3 rounded-lg bg-gray-100"
@@ -64,6 +97,28 @@ const Reviews = ({ reviews }) => {
             </div>
             <hr></hr>
             <p>{review.comment}</p>
+            {userReviews.includes(review.id) && (
+              <>
+                <div className="flex self-end gap-3">
+                  <button
+                    onClick={() => {
+                      setModalPresets({ ...review });
+                      setModalOpen(true);
+                    }}
+                  >
+                    <Pencil className="ative:scale-[0.95]" />
+                  </button>
+                  <button
+                    onClick={async () => {
+                      await removeReview(review.id);
+                      refresh({ fetchPolicy: "network-only" });
+                    }}
+                  >
+                    <Trash2 className="text-red-500 active:scale-[0.95]" />
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         ))}
       </div>

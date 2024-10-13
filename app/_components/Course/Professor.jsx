@@ -12,7 +12,7 @@ import Reviews from "./Reviews";
 
 const inter = Inter({ subsets: ["latin"] });
 
-const Professor = ({ data, identifier }) => {
+const Professor = ({ data, identifier, refresh }) => {
   const gradeChartRef = useRef(null);
   const ratingChartRef = useRef(null);
   const { bookmarks, addBookmark, removeBookmark } = useBookmarks();
@@ -160,7 +160,11 @@ const Professor = ({ data, identifier }) => {
         </div>
       </div>
 
-      <Reviews reviews={data.reviews} />
+      <Reviews
+        reviews={data.reviews}
+        professorInfo={{ id: data.id, name: data.name }}
+        refresh={refresh}
+      />
     </div>
   );
 };

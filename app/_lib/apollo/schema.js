@@ -88,6 +88,7 @@ export default gql`
     tags: [String]
     takeAgain: Boolean
     grade: String
+    id: String
   }
 
   type Query {
@@ -104,11 +105,23 @@ export default gql`
     professor(college: String!, name: String!): Professor
 
     bookmarks: [String]!
+    reviews: [String]!
     bookmarkInfo: [Professor]!
   }
 
   type Mutation {
     addBookmark(id: String!): Boolean!
     removeBookmark(id: String!): Boolean!
+    addReview(
+      class: String!
+      comment: String!
+      difficulty: Int!
+      rating: Int!
+      tags: [String]!
+      takeAgain: Boolean!
+      grade: String!
+      professorId: String!
+    ): JSON!
+    removeReview(id: String!): JSON!
   }
 `;

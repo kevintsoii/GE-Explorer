@@ -13,6 +13,12 @@ const UserSchema = new mongoose.Schema(
     },
     bookmarks: {
       type: [String],
+      default: [],
+      required: true,
+    },
+    reviews: {
+      type: [String],
+      default: [],
       required: true,
     },
   },

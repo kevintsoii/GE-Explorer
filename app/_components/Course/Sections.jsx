@@ -119,6 +119,7 @@ const Sections = ({ college, sections, identifier }) => {
             <Professor
               data={data.professor}
               identifier={`${identifier}|${variables.crn}`}
+              refresh={getProfessor}
             />
           )}
         </Modal>
@@ -130,6 +131,7 @@ const Sections = ({ college, sections, identifier }) => {
             <Professor
               data={data.professor}
               identifier={`${identifier}|${variables.crn}`}
+              refresh={getProfessor}
             />
           )}
         </div>

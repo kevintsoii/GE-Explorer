@@ -243,6 +243,15 @@ async function bookmarks(parent, args, context) {
   return user?.bookmarks || [];
 }
 
+async function reviews(parent, args, context) {
+  if (!context.user || !context.user.email) {
+    throw new GraphQLError("Unauthorized");
+  }
+
+  const user = await User.findOne({ email: context.user.email });
+  return user?.reviews || [];
+}
+
 async function bookmarkInfo(parent, args, context) {
   if (!context.user || !context.user.email) {
     throw new GraphQLError("Unauthorized");
@@ -350,6 +359,7 @@ const resolvers = {
   course,
   professor,
   bookmarks,
+  reviews,
   bookmarkInfo,
 };
 
