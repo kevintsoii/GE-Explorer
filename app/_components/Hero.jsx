@@ -18,14 +18,14 @@ const Hero = () => {
 
       <div className="overflow-clip">
         <section className="fade-up mt-12 flex flex-col items-center gap-5 ">
-          <h1 className="text-8xl text-black text-center font-bold">
+          <h1 className="text-6xl lg:text-8xl max-w-[75%] text-black text-center font-bold">
             <span className="text-transparent bg-clip-text bg-gradient-to-br from-[#1359f9] to-[#e3e5e9] ">
               Explore
             </span>{" "}
             GEs with Ease
           </h1>
 
-          <p className="text-gray-500 text-center text-lg">
+          <p className="text-gray-500 text-center text-lg max-w-[75%]">
             Browse our collection of General Education courses
           </p>
         </section>
@@ -54,8 +54,8 @@ const Hero = () => {
         </button>
       </Link>
 
-      <div className="flex items-center w-full mt-12 gap-12 justify-between">
-        <div className="relative flex h-[425px] w-1/2 items-center justify-center overflow-hidden">
+      <div className="flex lg:flex-row flex-col items-center w-full mt-12 gap-12 justify-between">
+        <div className="relative flex h-[425px] w-full lg:w-1/2 items-center justify-center overflow-hidden">
           <span className="pointer-events-none text-center text-5xl font-semibold leading-normal text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-violet-500 to-blue-500">
             100+ Subjects
           </span>
@@ -94,7 +94,7 @@ const Hero = () => {
           </OrbitingCircles>
         </div>
 
-        <div className="flex flex-col gap-5 w-1/2">
+        <div className="flex flex-col gap-5 w-[70%] lg:w-1/2">
           <h2 className="text-4xl font-medium text-black">
             Find the perfect course for{" "}
             <span className="decor decoration-wavy underline decoration-indigo-600 underline-offset-4">
