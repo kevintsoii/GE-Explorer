@@ -13,11 +13,11 @@ import OrbitingCircles from "@/app/_components/ui/orbiting-circles";
 const Hero = () => {
   return (
     <>
-      <div className="w-[20vw] h-[30vh] bg-blue-600 rounded-[75%] absolute z-3 top-[60%] left-[70%] translate-x--1/2 translate-y--1/2 blur-[140px]" />
+      <div className="w-[20vw] h-[30vh] bg-blue-600 rounded-[75%] absolute z-3 top-[60%] left-[70%] translate-x--1/2 translate-y--1/2 blur-[150px]" />
       <div className="w-[20vw] h-[20vh] bg-blue-600 rounded-[75%] absolute z-3 top-[40%] left-[10%] translate-x--1/2 translate-y--1/2 blur-[140px]" />
 
       <div className="overflow-clip">
-        <section className="fade-up mt-12 flex flex-col items-center gap-5 ">
+        <section className="fade-up mt-6 flex flex-col items-center gap-5 ">
           <h1 className="text-6xl lg:text-8xl max-w-[75%] text-black text-center font-bold">
             <span className="text-transparent bg-clip-text bg-gradient-to-br from-[#1359f9] to-[#e3e5e9] ">
               Explore
@@ -54,7 +54,7 @@ const Hero = () => {
         </button>
       </Link>
 
-      <div className="flex lg:flex-row flex-col items-center w-full mt-12 gap-12 justify-between">
+      <div className="flex lg:flex-row flex-col items-center w-full mt-2 gap-12 justify-between">
         <div className="relative flex h-[425px] w-full lg:w-1/2 items-center justify-center overflow-hidden">
           <span className="pointer-events-none text-center text-5xl font-semibold leading-normal text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-violet-500 to-blue-500">
             100+ Subjects
