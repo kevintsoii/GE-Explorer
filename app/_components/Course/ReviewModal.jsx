@@ -28,7 +28,7 @@ const Modal = ({ isOpen, onClose, professorInfo, refresh, presets }) => {
       setComment(presets.comment || "");
       setDifficulty(presets.difficulty || 1);
       setRating(presets.rating || 1);
-      setTags(presets.tags.map((tag) => ({ value: tag, label: tag })) || []);
+      setTags(presets.tags?.map((tag) => ({ value: tag, label: tag })) || []);
       setGrade(presets.grade || "A");
       setTakeAgain(presets.takeAgain || false);
     }
@@ -195,12 +195,20 @@ const Modal = ({ isOpen, onClose, professorInfo, refresh, presets }) => {
             />
           </label>
 
-          <button
-            type="submit"
-            className="px-3 py-2 mt-3 font-medium rounded-lg text-white bg-blue-500 active:scale-[0.98]"
-          >
-            Submit
-          </button>
+          <div className="flex gap-4">
+            <button
+              type="submit"
+              className="px-3 py-2 mt-3 font-medium rounded-lg text-white bg-blue-500 active:scale-[0.98]"
+            >
+              Submit
+            </button>
+            <button
+              onClick={onClose}
+              className="px-3 py-2 mt-3 font-medium rounded-lg text-blue-500 border border-blue-500 active:scale-[0.98]"
+            >
+              Cancel
+            </button>
+          </div>
 
           <p className="text-red-500 text-lg font-medium" ref={errorRef}>
             {error}
