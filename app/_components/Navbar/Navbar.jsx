@@ -13,8 +13,10 @@ const Navbar = () => {
   const { authUser, loading } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  if (loading) return null;
+
   return (
-    <nav className="absolute flex w-full h-20 px-4 sm:px-8 md:px-16 lg:px-32 overflow-x-hidden">
+    <nav className="fade-in absolute flex w-full h-20 px-4 sm:px-8 md:px-16 lg:px-32 overflow-x-hidden">
       <div className="hidden sm:flex w-full justify-between items-center">
         <Link href="/">
           <h1 className="font-semibold flex gap-1 text-xl items-center">
