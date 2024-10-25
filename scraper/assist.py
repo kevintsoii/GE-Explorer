@@ -12,27 +12,26 @@ def load_institutions(reload=False) -> list:
     '''
     Load list of all institutions from assist.org
     '''
-    data = load_json('data.json')
-    institutions = data.get("institutions")
+    institutions = load_json('institutions')
     if institutions and not reload:
         return institutions
 
-    data["institutions"] = []
+    institutions = []
     found_institutions = set()
     r = requests.get('https://assist.org/api/institutions')
     for institution in r.json():
         id = institution["id"] if 'alternateInstitutionId' not in institution["names"][-1] else institution["names"][-1]["alternateInstitutionId"]
         if id not in found_institutions:
             found_institutions.add(id)
-            data["institutions"].append({
-                "id": institution["id"],
+            institutions.append({
+                "id": id,
                 "name": institution["names"][-1]["name"],
                 "isCommunityCollege": institution["isCommunityCollege"]
             })
 
-    save_json('data.json', data)
-    print(f'Scraped {len(data["institutions"])} institutions')
-    return data["institutions"]
+    save_json('institutions', institutions)
+    print(f'Scraped {len(institutions)} institutions')
+    return institutions
 
 def isEnded(current_term: str, end_term: str) -> bool:
     if not end_term:
@@ -82,13 +81,13 @@ def scrape_csu_ges(cc_id: int, year_id: int, current_term: str) -> dict:
                             "title": course["courseTitle"].strip(),
                             "areas": areas
                         }
-                        if type(ended) is str:
-                            course_info["expiry"] = ended
-                        if type(ge_ended) is str:
-                            course_info["expiry"] = course_info.setdefault("expiry", "") + ge_ended
+                        #if type(ended) is str:
+                        #    course_info["expiry"] = ended
+                        #if type(ge_ended) is str:
+                        #    course_info["expiry"] = course_info.setdefault("expiry", "") + ge_ended
                         ges.append(course_info)
 
-            print(f'Scraped {cc_id} ({cc}): {len(ges)} CSU GEs')
+            #print(f'{cc}: {len(ges)} CSU GEs')
             return {cc: ges}
         except Exception as e:
             print(f'Error scraping {cc_id}: {e}')
@@ -103,29 +102,26 @@ def load_csu_ges(cc_ids: list, year_id: int, current_term: str, reload=False):
     year_id: academic year id, from assist.org/api/academicYears
     current_term: current academic year, e.g. "F2024, Su2020, S2025"
     '''
-    data = load_json('data.json')
-    csu_ges = data.get("csu_ges")
-    if csu_ges and not reload:
-        csu_ges["Coastline College"] = csu_ges.pop("Coastline Community College")
-        csu_ges["Coalinga College"] = csu_ges.pop("West Hills College Coalinga")
-        csu_ges["Lemoore College"] = csu_ges.pop("West Hills College Lemoore")
-        csu_ges["Mt. San Antonio College"] = csu_ges.pop("Mount San Antonio College")
-        return csu_ges
+    transferrability = load_json('transferrability')
+    if transferrability and not reload:
+        return transferrability
 
-    data["csu_ges"] = {}
+    transferrability = {}
     with ThreadPoolExecutor(max_workers=MAX_THREADS) as executor:
         futures = [executor.submit(scrape_csu_ges, cc_id, year_id, current_term) for cc_id in cc_ids]
         for future in futures:
             result = future.result()
             if result:
-                data["csu_ges"].update(result)
+                transferrability.update(result)
 
-    save_json('data.json', data)
-    print(f'Scraped {sum(len(data["csu_ges"][k]) for k in data["csu_ges"])} CSU GEs')
-    return data["csu_ges"]
+    save_json('transferrability', transferrability)
+    print(f'Scraped {sum(len(transferrability[k]) for k in transferrability)} CSU GEs')
+    return transferrability
 
 
 if __name__ == '__main__':
     institutions = load_institutions()
     cc_ids = [institution["id"] for institution in institutions if institution["isCommunityCollege"]]
-    load_csu_ges(cc_ids, year_id=75, current_term="F2024")
+    load_csu_ges(cc_ids, year_id=75, current_term="W2025")
+    # 75 = fall 2024 to fall 2025, 76 = fall 2025 to fall 2026
+    # F, W, S, Su

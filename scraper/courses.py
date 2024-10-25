@@ -38,20 +38,19 @@ specific_url = '/courses/%s?filter[day_ids][]=1&filter[day_ids][]=2&filter[day_i
 
 def load_subjects(reload=False) -> list:
     '''
-    Load list of all subjects ids from cvd.edu
+    Load list of all subjects ids from cvc.edu
     '''
-    data = load_json('data.json')
-    subjects = data.get("subjects")
+    subjects = load_json("subjects")
     if subjects and not reload:
         return subjects
     
     r = requests.get(f'https://search.{API_URL}/search?filter[search_all_universities]=true&filter[search_type]=subject_browsing', headers=headers)
     soup = BeautifulSoup(r.text, 'html.parser')
-    data["subjects"] = [element.get('value') for element in soup.select('.search-tab-requirement option') if element.get('value')]
+    subjects = [element.get('value') for element in soup.select('.search-tab-requirement option') if element.get('value')]
 
-    save_json('data.json', data)
-    print(f'Scraped {len(data["subjects"])} subjects')
-    return data["subjects"]
+    save_json('subjects', subjects)
+    print(f'Scraped {len(subjects)} subjects')
+    return subjects
 
 def scrape_courses(subject_id: str) -> list:
     '''
