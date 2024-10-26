@@ -46,7 +46,9 @@ const createGradeChart = (filteredGrades, gradeChartRef) => {
 
   svg
     .append("g")
-    .call(d3.axisLeft(y).ticks(Math.min(7, d3.max(gradeCount) / 2)))
+    .call(
+      d3.axisLeft(y).ticks(Math.min(7, Math.max(5, d3.max(gradeCount) / 2)))
+    )
     .selectAll("text")
     .style("font-size", "14px");
 
@@ -107,7 +109,9 @@ const createRatingChart = (ratings, ratingChartRef) => {
 
   svg
     .append("g")
-    .call(d3.axisLeft(y).ticks(Math.min(7, d3.max(ratingCount) / 5)))
+    .call(
+      d3.axisLeft(y).ticks(Math.min(7, Math.max(5, d3.max(ratingCount) / 2)))
+    )
     .selectAll("text")
     .style("font-size", "14px");
 

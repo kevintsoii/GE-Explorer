@@ -35,7 +35,7 @@ View on https://ge-explorer.vercel.app/
    NEXT_PUBLIC_FIREBASE_APP_ID=""
    NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=""
 
-   FIREBASE_ADMIN_CONFIG='{}'
+   FIREBASE_ADMINCONFIG='{}'
    ```
 
 4. Run the scraper in `/scraper` to populate MongoDB

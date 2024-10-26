@@ -10,7 +10,7 @@ import { dateScalar } from "@/app/_lib/apollo/scalars";
 import queryResolvers from "@/app/_lib/apollo/queryResolvers";
 import mutationResolvers from "@/app/_lib/apollo/mutationResolvers";
 
-const firebaseAdminConfig = JSON.parse(process.env.FIREBASE_ADMIN_CONFIG);
+const firebaseAdminConfig = JSON.parse(process.env.FIREBASE_ADMINCONFIG);
 const db = await connectToDatabase();
 
 if (getApps().length === 0) {
