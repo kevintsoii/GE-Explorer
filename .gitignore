@@ -5,6 +5,7 @@
 **/.venv/
 **/.env
 scraper/data.json
+scraper/data/
 
 # dependencies
 /node_modules

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { mapColor } from "@/app/_lib/util/map";
 import { useReviews } from "@/app/_lib/contexts/ReviewsContext";
+import { useAuth } from "@/app/_lib/firebase/AuthContext";
 
 import Rating from "@mui/material/Rating";
 import Divider from "@/app/_components/Divider";
@@ -29,6 +30,7 @@ const Reviews = ({ reviews, professorInfo, refresh }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalPresets, setModalPresets] = useState({});
   const { reviews: userReviews, removeReview } = useReviews();
+  const { authUser, loading } = useAuth();
 
   const reviewsSorted = reviews?.slice().sort((a, b) => {
     if (a.date === null) return 1;
@@ -52,6 +54,7 @@ const Reviews = ({ reviews, professorInfo, refresh }) => {
         <div className="flex items-center">
           <Tooltip title="Leave a Review" placement="top">
             <button
+              disabled={!authUser}
               onClick={() => {
                 setModalOpen(true);
               }}
