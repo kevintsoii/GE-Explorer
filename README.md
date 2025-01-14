@@ -11,6 +11,8 @@ GE Explorer is a course review platform for CSU students to browse and review Ge
 
 View on https://ge-explorer.vercel.app/
 
+![image](https://github.com/user-attachments/assets/a7c99479-0ac2-4390-9339-4184c0636f04)
+
 ## Prerequisites
 
 - [Node.js](https://nodejs.org/en)
