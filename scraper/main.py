@@ -5,10 +5,11 @@ from dotenv import load_dotenv
 from pymongo import errors
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
+from pymongo import UpdateOne
 from collections import defaultdict
 
 from assist import load_csu_ges
-from courses import load_sections
+from courses import load_courses
 from professors import load_professors
 
 
@@ -35,11 +36,11 @@ def save_ges():
     ge_areas = db["ge-areas"]
     ge_areas.create_index("area", unique=True)
 
-    csu_ges = load_csu_ges([], year_id=75, current_term="F2024")
+    transferrability = load_csu_ges([], year_id=75, current_term="F2024")
 
     area_info = {}
-    for cc in csu_ges:
-        for course in csu_ges[cc]:
+    for cc in transferrability:
+        for course in transferrability[cc]:
             for area in course["areas"]:
                 area_info[area["area"]] = area["title"]
 
@@ -51,7 +52,7 @@ def save_ges():
     except errors.BulkWriteError as e:
         pass
 
-    print("Saved GE areas")
+    print(f"Saved GE areas ({len(area_info)})")
 
 def save_courses():
     '''
@@ -63,38 +64,39 @@ def save_courses():
     cc_sections.create_index("sections.professor")
     cc_sections.create_index("sections.crn")
     
-    csu_ges = load_csu_ges([], year_id=75, current_term="F2024")
-    transferrable = {}
     transfer_areas = {}
-    for cc in csu_ges:
-        transferrable[cc] = set()
+    transferrable_courses = {}
+    transferrability = load_csu_ges([], year_id=75, current_term="F2024")
+    for cc in transferrability:
+        transferrable_courses[cc] = set()
         transfer_areas[cc] = defaultdict(set)
-        for course in csu_ges[cc]:
-            transferrable[cc].add(f'{course["prefix"].upper()}{course["number"]}'.replace(' ', '').replace('/', ''))
-            transfer_areas[cc][f'{course["prefix"].upper()}{course["number"]}'.replace(' ', '').replace('/', '')].update([x["area"] for x in course["areas"]])
+        for course in transferrability[cc]:
+            course_code = f'{course["prefix"].upper()}{course["number"]}'.replace(' ', '').replace('/', '')
+            transferrable_courses[cc].add(course_code)
+            transfer_areas[cc][course_code].update([x["area"] for x in course["areas"]])
 
-    courses = []
-    sections = load_sections([])
-    for course in sections:
+    offerings = []
+    courses = load_courses([])
+    for course in courses:
         course_code = course["course"].split(" - ")[0]
-        if course_code in transferrable[course["college"]]:
+        if course_code in transferrable_courses[course["college"]]:
             for section in course["sections"]:
                 section["seats"] = section["seats"].replace(' available seats', '')
                 section["seats_updated"] = section["seats_updated"].replace('- ', '').replace('(about ', '').replace(')', '')
-                del section["format"]
+                section["format"].replace("Online - ", "")
             course["title"] = course["course"].split(" - ")[-1]
             course["course"] = course["course"].split(" - ")[0]
             course["areas"] = list(transfer_areas[course["college"]][course_code])
-            courses.append(course)
+            offerings.append(course)
 
     try:
         cc_sections.insert_many(
-            courses,
+            offerings,
             ordered=False
         )
     except errors.BulkWriteError as e:
         pass
-    print("Saved courses")
+    print(f"Saved courses ({len(offerings)})")
 
 def save_professors():
     '''
@@ -159,22 +161,43 @@ def save_professors():
                 "avgGrade": avg_grade,
                 "avgDifficulty": round(difficulty / len(reviews), 1) if len(reviews) > 0 else None,
                 "takeAgain": round((takeAgain[0] / takeAgain[-1]) * 100) if takeAgain[-1] > 0 else None,
+                
                 "tags": dict(sorted(tags.items(), key=lambda item: item[1], reverse=True)),
                 "reviews": reviews
             })
 
-    try:
-        cc_professors.insert_many(
-            professors,
-            ordered=False
+    operations = [
+        UpdateOne(
+            {"id": professor["id"]},
+            {
+                "$set": {
+                    "officialName": professor["officialName"],
+                    "name": professor["name"],
+                    "college": professor["college"],
+                    "avgRating": professor["avgRating"],
+                    "avgGrade": professor["avgGrade"],
+                    "avgDifficulty": professor["avgDifficulty"],
+                    "takeAgain": professor["takeAgain"],
+                    "tags": professor["tags"]
+                },
+                "$addToSet": {
+                    "reviews": {"$each": professor.get("reviews", [])}
+                }
+            },
+            upsert=True
         )
-    except errors.BulkWriteError as e:
-        pass
-    print("Saved professors")
+        for professor in professors
+    ]
+        
+    try:
+        cc_professors.bulk_write(operations)
+    except Exception as e:
+        print(e)
+    print(f"Saved professors ({len(professors)})")
 
 
 #save_ges()
-save_courses()
-#save_professors()
+#save_courses()
+save_professors()
 
 client.close()

@@ -122,6 +122,6 @@ def load_csu_ges(cc_ids: list, year_id: int, current_term: str, reload=False):
 if __name__ == '__main__':
     institutions = load_institutions()
     cc_ids = [institution["id"] for institution in institutions if institution["isCommunityCollege"]]
-    load_csu_ges(cc_ids, year_id=75, current_term="W2025")
+    ges = load_csu_ges(cc_ids, year_id=75, current_term="S2025")
     # 75 = fall 2024 to fall 2025, 76 = fall 2025 to fall 2026
     # F, W, S, Su

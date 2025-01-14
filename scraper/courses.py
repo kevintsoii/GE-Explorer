@@ -27,13 +27,14 @@ params = {
     'filter[oei_phase_2_filter]': 'false',
     'filter[show_only_available]': 'false',
     'filter[delivery_methods][]': 'online',
-    'filter[delivery_method_subtypes][]': 'online_async',
+    'filter[delivery_method_subtypes][]': ["online_sync", "online_async"],
     'filter[prerequisites][]': ['', 'no_prereqs'],
-    'filter[session_names][]': 'Fall 2024', # modify semesters
+    'filter[session_names][]': ["Winter 2025", "Spring 2025"], # modify semesters
+    "filter[zero_textbook_cost_filter]": "false",
     'page': '', # modify page number
 }
 
-specific_url = '/courses/%s?filter[day_ids][]=1&filter[day_ids][]=2&filter[day_ids][]=3&filter[day_ids][]=4&filter[day_ids][]=5&filter[day_ids][]=6&filter[day_ids][]=7&filter[delivery_method_subtypes][]=online_async&filter[delivery_methods][]=online&filter[oei_phase_2_filter]=false&filter[prerequisites][]=&filter[prerequisites][]=no_prereqs&filter[residency_id]=5&filter[search_all_universities]=true&filter[search_type]=subject_browsing&filter[session_names][]=Fall+2024&filter[show_only_available]=false&filter[show_self_paced]=true&filter[show_untimed]=true&filter[sort]=oei&filter[subject_id]=%s&filter[transferability][]=articulation' # course id, subject id | Fall 2024 semester
+specific_url = '/courses/%s?filter[subject_id]=%s&filter[day_ids][]=1&filter[day_ids][]=2&filter[day_ids][]=3&filter[day_ids][]=4&filter[day_ids][]=5&filter[day_ids][]=6&filter[day_ids][]=7&filter[delivery_method_subtypes][]=online_async&filter[delivery_method_subtypes][]=online_sync&filter[oei_phase_2_filter]=false&filter[prerequisites][]=&filter[prerequisites][]=no_prereqs&filter[residency_id]=5&filter[search_all_universities]=true&filter[search_type]=subject_browsing&filter[session_names][]=Winter+2025&filter[session_names][]=Spring+2025&filter[show_only_available]=false&filter[show_self_paced]=true&filter[show_untimed]=true&filter[sort]=oei&filter[transferability][]=articulation' # course id, subject id | Fall 2024 semester
 
 
 def load_subjects(reload=False) -> list:
@@ -52,7 +53,7 @@ def load_subjects(reload=False) -> list:
     print(f'Scraped {len(subjects)} subjects')
     return subjects
 
-def scrape_courses(subject_id: str) -> list:
+def scrape_ids(subject_id: str) -> list:
     '''
     Scrape courses for a specific subject
     '''
@@ -84,31 +85,30 @@ def scrape_courses(subject_id: str) -> list:
     print(f'Scraped {len(courses)} courses for subject {subject_id}')
     return list(courses)
 
-def load_courses(subjects: list, reload=False) -> list:
+def load_course_ids(subjects: list, reload=False) -> list:
     '''
     Load list of all courses for a list of subjects
 
     subjects: list of subject ids
     '''
-    data = load_json('data.json')
-    courses = data.get("cc_courses")
-    if courses and not reload:
-        return courses
+    course_ids = load_json('course_ids')
+    if course_ids and not reload:
+        return course_ids
     
-    data["cc_courses"] = set()
+    course_ids = set()
     with ThreadPoolExecutor(max_workers=MAX_THREADS) as executor:
-        futures = [executor.submit(scrape_courses, subject) for subject in subjects]
+        futures = [executor.submit(scrape_ids, subject) for subject in subjects]
         for future in futures:
             result = future.result()
             if result:
-                data["cc_courses"].update(result)
+                course_ids.update(result)
 
-    data["cc_courses"] = list(data["cc_courses"])
-    save_json('data.json', data)
-    print(f'Scraped {len(data["cc_courses"])} GE courses')
-    return data["cc_courses"]
+    course_ids = list(course_ids)
+    save_json('course_ids', courses)
+    print(f'Scraped {len(course_ids)} GE courses')
+    return course_ids
 
-def scrape_sections(course: str, subject: str) -> list:
+def scrape_courses(course: str, subject: str) -> list:
     result = {"sections": [], "identifier": f"{subject}:{course}"}
     for _ in range(MAX_RETRIES):
         try:
@@ -118,6 +118,9 @@ def scrape_sections(course: str, subject: str) -> list:
             information = soup.select_one('.course')
 
             result["college"] = information.select_one('.subtitle .font-semibold').get_text().strip()
+            if result["college"] == "Mt. San Antonio College":
+                result["college"] = "Mount San Antonio College"
+
             result["course"] = information.select_one('.text-2xl').get_text().strip()
             descriptions = information.select('.course-description p')
             while descriptions:
@@ -125,9 +128,9 @@ def scrape_sections(course: str, subject: str) -> list:
                 if description:
                     result["description"] = description
                     break
+            
             result["price"] = float(information.select_one('.text-c_link.text-2xl').get_text().strip().replace(',', '').replace('Tuition:$', ''))
             result["units"] = str(information.select_one('.purchase-details')).split(' unit')[0].split('">')[-1].strip()
-            print(result["units"])
 
             for section in information.select('[data-controller="linked-section-apply-check"]'):
                 result["sections"].append({
@@ -136,40 +139,40 @@ def scrape_sections(course: str, subject: str) -> list:
                     "professor": section.select_one('.section-details-professor').get_text().strip(),
                     "seats": section.select_one('.seat-count-live.seat-count .seat-count-number').get_text().strip(),
                     "seats_updated": section.select_one('.seat-count-live.seat-count .text-xs').get_text().strip(),
-                    "format": section.select_one('[data-tooltip-title-value="Asynchronous: Online classes that do not have designated scheduled meeting times or real-time online class sessions."]').get_text().strip(),
+                    "format": section.select_one('div.lg\\:pl-4 button.text-sm.font-medium').get_text().strip(),
                 })
             
             print(f'Scraped {course} ({subject}): {len(result["sections"])} sections')
+            break
         except Exception as e:
-            print(f'Error scraping {course} | {subject}: {e}')
+            print(f'Error scraping {course} | {subject}: {e.__traceback__.tb_lineno}: {e}')
     
     return result
 
-def load_sections(courses: list, reload=False) -> list:
+def load_courses(course_ids: list = [], reload=False) -> list:
     '''
     Load list of all sections for a list of courses
 
     courses: list of course ids with corresponding subject id
     '''
-    data = load_json('data.json')
-    sections = data.get("cc_sections")
-    if sections and not reload:
-        return sections
+    courses = load_json('courses')
+    if courses and not reload:
+        return courses
     
-    data["cc_sections"] = []
+    courses = []
     with ThreadPoolExecutor(max_workers=MAX_THREADS) as executor:
-        futures = [executor.submit(scrape_sections, course.split(':')[0], course.split(':')[1]) for course in courses]
+        futures = [executor.submit(scrape_courses, course_id.split(':')[0], course_id.split(':')[1]) for course_id in course_ids]
         for future in futures:
             result = future.result()
             if result:
-                data["cc_sections"].append(result)
+                courses.append(result)
 
-    save_json('data.json', data)
-    print(f'Scraped {sum(len(course["sections"]) for course in data["cc_sections"])} CC class sections')
-    return data["cc_sections"]
+    save_json('courses', courses)
+    print(f'Scraped {sum(len(course["sections"]) for course in courses)} CC class sections')
+    return courses
 
 
 if __name__ == '__main__':
     subjects = load_subjects()
-    cc_courses = load_courses(subjects)
-    sections = load_sections(cc_courses)
+    course_ids = load_course_ids(subjects)
+    courses = load_courses(course_ids)

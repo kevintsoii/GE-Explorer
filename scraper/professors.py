@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from concurrent.futures import ThreadPoolExecutor
 
 from util import load_json, save_json
-from courses import load_sections
+from courses import load_courses
 
 
 load_dotenv()
@@ -67,12 +67,14 @@ def scrape_college(college_name: str) -> str:
     # Special cases - have multiple campuses, false entries, or other issues
     if college_name.lower() == 'College of the Desert'.lower():
         return college_name, "U2Nob29sLTE4OTE="
-    if college_name.lower() == 'Coastline College'.lower():
+    if college_name.lower() == 'Coastline Community College'.lower():
         return college_name, "U2Nob29sLTE4NzU="
     if college_name.lower() == 'Coalinga College'.lower():
         return college_name, "U2Nob29sLTE3OTIw"
     if college_name.lower() == 'Ohlone College'.lower():
-        return college_name, "U2Nob29sLTE4ODU2"
+        return college_name, "U2Nob29sLTI2MTQ="
+    if college_name.lower() == 'Mount San Antonio College'.lower():
+        return college_name, "U2Nob29sLTEzNzM0"
 
     for _ in range(MAX_RETRIES):
         try:
@@ -86,7 +88,6 @@ def scrape_college(college_name: str) -> str:
                     if results[college]["state"] and results[college]["state"] != 'CA':
                         continue
                     if college_name.lower() in results[college]["name"].lower():
-                        
                         return college_name, results[college]["id"]
                     break
             
@@ -101,24 +102,23 @@ def load_colleges(names: list, reload=False) -> list:
     '''
     Load college info for each college name
     '''
-    data = load_json('data.json')
-    colleges = data.get("colleges")
+    colleges = load_json('colleges')
     if colleges and not reload:
         return colleges
     
-    data["colleges"] = {}
+    colleges = {}
     with ThreadPoolExecutor(max_workers=MAX_THREADS) as executor:
         futures = [executor.submit(scrape_college, name) for name in names]
         for future in futures:
             result = future.result()
             if result:
                 name, id = result
-                data["colleges"][name] = id
-                data["colleges"][id] = name
+                colleges[name] = id
+                colleges[id] = name
 
-    save_json('data.json', data)
-    print(f'Scraped {len(data["colleges"])} colleges')
-    return data["colleges"]
+    save_json('colleges', colleges)
+    print(f'Scraped {len(colleges)//2} colleges')
+    return colleges
 
 def clean_name(name: str) -> str:
     '''
@@ -131,13 +131,13 @@ def clean_name(name: str) -> str:
         if cleaned_name.lower().startswith(substring.lower()):
             cleaned_name = cleaned_name[len(substring):]
             break
-    for substring in  [' Ph.D', ' jr.', 'jr', ', III', ', II', ' III', ' II']:
+    for substring in  [', Ph.D', ' jr.', 'jr', ', III', ', II', ' III', ' II']:
         if cleaned_name.lower().endswith(substring.lower()):
             cleaned_name = cleaned_name[:-len(substring)]
             break
     # remove trailing commas, periods, and spaces
     cleaned_name = cleaned_name.rstrip(',. ')
-    # also handle some colleges only providing first initial
+
     if ', ' not in cleaned_name or len(cleaned_name.split(', ')[-1]) > 1:
         # handle possible middle intial or name
         if len(cleaned_name.split(' ')[-1]) == 1:
@@ -148,6 +148,7 @@ def clean_name(name: str) -> str:
         else:
             cleaned_name = cleaned_name.split(' ')[0] + ' ' + cleaned_name.split(' ')[-1]
     else:
+        # some colleges only providing first initial
         cleaned_name = cleaned_name.split(',')[0] + cleaned_name[-3:]
     
     return cleaned_name.strip()
@@ -233,12 +234,11 @@ def load_professors(professor_data: list, college_dict: dict, reload=False) -> l
 
     professors: list of (college name, professor name) tuples
     '''
-    data = load_json('data.json')
-    professors = data.get("professors")
+    professors = load_json('professors')
     if professors and not reload:
         return professors
 
-    data["professors"] = {}
+    professors = {}
     with ThreadPoolExecutor(max_workers=MAX_THREADS) as executor:
         futures = [executor.submit(scrape_professor, college_dict[college_name], professor_name) for college_name, professor_name in professor_data]
         for future in futures:
@@ -246,11 +246,11 @@ def load_professors(professor_data: list, college_dict: dict, reload=False) -> l
             if result:
                 college_id, professor_info = result
                 college = college_dict[college_id]
-                data["professors"].setdefault(college, []).append(professor_info)
+                professors.setdefault(college, []).append(professor_info)
 
-    save_json('data.json', data)
-    print(f'Scraped {sum(len(data["professors"][college]) for college in data["professors"])} / {len(professor_data)} professors')
-    return data["professors"]
+    save_json('professors', professors)
+    print(f'Scraped {sum(len(professors[college]) for college in professors)} / {len(professor_data)} professors')
+    return professors
 
 
 if __name__ == '__main__':
@@ -258,9 +258,9 @@ if __name__ == '__main__':
     1. Get College IDs from college names
     2. Get Professor info from collage id + professor name
     '''
-    sections = load_sections([])    
-    college_names = list(set(course["college"] for course in sections))
+    courses = load_courses()    
+    college_names = list(set(course["college"] for course in courses))
     colleges = load_colleges(college_names)
 
-    professors = list(set((course["college"], section["professor"]) for course in sections for section in course["sections"]))
-    professors_info = load_professors(professors, colleges)
+    professors = list(set((course["college"], section["professor"]) for course in courses for section in course["sections"]))
+    professors_info = load_professors(professors, colleges, reload=True)
